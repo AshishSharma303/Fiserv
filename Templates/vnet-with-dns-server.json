@@ -1,0 +1,136 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "prefix": {
+      "type": "string",
+      "defaultValue": "fwd_",
+      "metadata": {
+        "description": "Prefix information coming from Ingest template"
+      }
+    },
+    "addressPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.0.0/16",
+      "metadata": {
+        "description": "addressPrefix information coming from Ingest template"
+      }
+    },
+    "subnet1Prefixvalue": {
+      "type": "string",
+      "defaultValue": "10.0.10.0/24",
+      "metadata": {
+        "description": "subnet1Prefixvalue information coming from Ingest template"
+      }
+    },
+    "subnet2Prefixvalue": {
+      "type": "string",
+      "defaultValue": "10.0.20.0/24",
+      "metadata": {
+        "description": "subnet2Prefixvalue information coming from Ingest template"
+      }
+    },
+    "subnet3Prefixvalue": {
+      "type": "string",
+      "defaultValue": "10.0.30.0/24",
+      "metadata": {
+        "description": "subnet3Prefixvalue information coming from Ingest template"
+      }
+    },
+    "gatewaySubnetPrefix": {
+      "type": "string",
+      "defaultValue": "10.0.40.0/24",
+      "metadata": {
+        "description": "subnet4Prefixvalue information coming from Ingest template"
+      }
+    },
+    "businessUnit": {
+      "type": "string",
+      "metadata": {
+        "description": "Tag for resource"
+      }
+    },
+    "owner": {
+      "type": "string",
+      "metadata": {
+        "description": "Tag for resource"
+      }
+    },
+    "costCenter": {
+      "type": "string",
+      "metadata": {
+        "description": "Tag for resource"
+      }
+    },
+    "DNSServerAddress": {
+      "type": "array",
+      "metadata": {
+        "Description": "The DNS address(es) of the DNS Server(s) used by the VNET"
+      }
+    }
+  },
+  "variables": {
+    "virtualNetworkName": "[concat(parameters('prefix'),'-vnet')]",
+    "Vmname": "[concat(parameters('prefix'),'-vm-')]",
+    "addressPrefix": "[parameters('addressPrefix')]",
+    "subnet1Name": "[concat(parameters('prefix'), '-subnet-dmz')]",
+    "subnet2Name": "[concat(parameters('prefix'), '-subnet-app')]",
+    "subnet3Name": "[concat(parameters('prefix'), '-subnet-be')]",
+    "subnet4Name": "GatewaySubnet",
+    "subnet1Prefix": "[parameters('subnet1Prefixvalue')]",
+    "subnet2Prefix": "[parameters('subnet2Prefixvalue')]",
+    "subnet3Prefix": "[parameters('subnet3Prefixvalue')]",
+    "subnet4Prefix": "[parameters('gatewaySubnetPrefix')]"
+
+  },
+    "resources": [
+      {
+        "type": "Microsoft.Network/virtualNetworks",
+        "name": "[variables('virtualNetworkName')]",
+        "apiVersion": "2016-03-30",
+        "location": "[resourceGroup().location]",
+        "tags": {
+          "businessUnit": "[parameters('businessUnit')]",
+          "owner": "[parameters('owner')]",
+          "costCenter": "[parameters('costCenter')]"
+        },
+        "properties": {
+          "addressSpace": {
+            "addressPrefixes": [
+              "[variables('addressPrefix')]"
+            ]
+          },
+          "dhcpOptions": {
+            "dnsServers": "[parameters('DNSServerAddress')]"
+          },
+          "subnets": [
+            {
+              "name": "[variables('subnet1Name')]",
+              "properties": {
+                "addressPrefix": "[variables('subnet1Prefix')]"
+              }
+            },
+            {
+              "name": "[variables('subnet2Name')]",
+              "properties": {
+                "addressPrefix": "[variables('subnet2Prefix')]"
+              }
+            },
+            {
+              "name": "[variables('subnet3Name')]",
+              "properties": {
+                "addressPrefix": "[variables('subnet3Prefix')]"
+              }
+            },
+            {
+              "name": "[variables('subnet4Name')]",
+              "properties": {
+                "addressPrefix": "[variables('subnet4Prefix')]"
+              }
+            }
+
+          ]
+        }
+      }
+    ]
+  }

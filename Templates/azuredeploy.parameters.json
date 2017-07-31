@@ -1,0 +1,33 @@
+﻿{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "dnsPrefix": { "value": "dns-dc-ext" },
+    "domainName": { "value": "fwd_dev.local" },
+    "adminUsername": { "value": "azureadmin" },
+    "adminPassword": { "value": "Password@12345" },
+    "prefix": { "value": "fwd" },
+    "addressPrefix": { "value": "10.0.0.0/16" },
+    "subnet1Prefixvalue": { "value": "10.0.10.0/24" },
+    "subnet2Prefixvalue": { "value": "10.0.20.0/24" },
+    "subnet3Prefixvalue": { "value": "10.0.30.0/24" },
+    "gatewaySubnetPrefix": { "value": "10.0.40.0/24" },
+    "OS": { "value": "Windows" },
+    "numberOfInstances": { "value": 1 },
+    "numberOfDisks": { "value": 1 },
+    "businessUnit": { "value": "BU" },
+    "owner": { "value": "owner" },
+    "costCenter": { "value": "CC" },
+    "dnsNameforLBIP": { "value": "hcf-remoteconnect" },
+    "publicIPAddressName": { "value": "hcf-public-lb-ip" },
+    "noOfDataDisk": { "value": 1 },
+    "dataDiskSize": { "value": 128 },
+    "dataDiskType": { "value": "StandardLRS" },
+    "diag_storageAccount_name": { "value": "fwd_diagsa" },
+    "lockedResource": { "value": "storageLock" },
+    "localGatewayName": { "value": "onPremGateway" },
+    "localGatewayIpAddress": { "value": "124.123.157.36" },
+    "localAddressPrefix": { "value": "192.168.0.0/24" }
+  }
+
+}

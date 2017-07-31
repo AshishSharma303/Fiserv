@@ -1,0 +1,703 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "Location": {
+      "type": "string"
+    },
+    "Environment": {
+      "type": "string"
+    },
+    "ilbName": {
+      "type": "string"
+
+    },
+    "ilbIPAddress": {
+      "type": "string"
+
+    },
+    "ADDSAvailablitysetName": {
+      "type": "string"
+
+    },
+    "ADFSAvailablitysetName": {
+      "type": "string"
+
+    },
+    "ADFSNSGName": {
+      "type": "string"
+
+    },
+    "ADDSNSGName": {
+      "type": "string"
+
+    },
+
+    "addsstorageaccountname": {
+      "type": "string"
+    },
+    "adddsstorageaccountType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    },
+    "diagstorageaccountname": {
+      "type": "string"
+    },
+    "diagstorageaccountType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_ZRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ]
+    },
+    "addsVNamePrefix": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ADDSVNSize": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ADFSVNSize": {
+      "type": "string",
+      "minLength": 1
+    },
+    "adfsVNamerefix": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ADDSVMAdminUserName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ADDSVMAdminPassword": {
+      "type": "securestring"
+    },
+    "ADDSVMWindowsOSVersion": {
+      "type": "string",
+      "defaultValue": "2012-R2-Datacenter",
+      "allowedValues": [
+        "2008-R2-SP1",
+        "2012-Datacenter",
+        "2012-R2-Datacenter",
+        "Windows-Server-Technical-Preview"
+      ]
+    },
+    "Identity Virtual Network Name": {
+      "type": "string"
+    },
+    "Identity VnetPrefix": {
+      "type": "string"
+    },
+    "Gateway Subnet Prefix": {
+      "type": "string"
+    },
+    "ADDS Subnet Name": {
+      "type": "string"
+    },
+    "ADDS Subnet Prefix": {
+      "type": "string"
+    },
+    "ADFS Subnet Name": {
+      "type": "string"
+    },
+    "ADFS Subnet Prefix": {
+      "type": "string"
+    },
+    "ADFSVMAdminUserName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "ADFSVMAdminPassword": {
+      "type": "securestring"
+    },
+    "ADFSVMWindowsOSVersion": {
+      "type": "string",
+      "defaultValue": "2012-R2-Datacenter",
+      "allowedValues": [
+        "2008-R2-SP1",
+        "2012-Datacenter",
+        "2012-R2-Datacenter",
+        "Windows-Server-Technical-Preview"
+      ]
+    }
+  },
+  "variables": {
+    "VMImagePublisher": "MicrosoftWindowsServer",
+    "VMImageOffer": "WindowsServer",
+    "ADDSVMStorageAccountContainerName": "vhds",
+    "ADFSVMNicVnetID": "[resourceId('Microsoft.Network/virtualNetworks', Parameters('Identity Virtual Network Name'))]",
+    "ADFSVMNicSubnetRef": "[concat(variables('ADFSVMNicVnetID'), '/subnets/', parameters('ADFS Subnet Name'))]",
+    "ADDSVMImagePublisher": "MicrosoftWindowsServer",
+    "numberOfInstances": 2,
+    "storageAccountType": "Standard_LRS",
+    "ADDSVMImageOffer": "WindowsServer",
+    "ADDSVMVnetID": "[resourceId('Microsoft.Network/virtualNetworks', Parameters('Identity Virtual Network Name'))]",
+    "ADDSVMSubnetRef": "[concat(variables('ADDSVMVnetID'), '/subnets/', parameters('ADDS Subnet Name'))]",
+    "ADFSVMVnetID": "[resourceId('Microsoft.Network/virtualNetworks', Parameters('Identity Virtual Network Name'))]",
+    "ADFSVMSubnetRef": "[concat(variables('ADFSVMVnetID'), '/subnets/', parameters('ADFS Subnet Name'))]",
+    "lbID": "[resourceId('Microsoft.Network/loadBalancers',parameters('ilbName'))]"
+
+
+
+
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('ADFSNSGName')]",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowRDP",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowHTTPSFromDMZ",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "10.0.1.0/24",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowAzureLoadBalancerInBound",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 300,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowRdpOut",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1200,
+              "direction": "Outbound"
+            }
+          }
+        ]
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[parameters('ADDSNSGName')]",
+      "apiVersion": "2016-03-30",
+      "location": "[parameters('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "AllowRDP",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowHTTPSFromDMZ",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "443",
+              "sourceAddressPrefix": "10.0.1.0/24",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 200,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowAzureLoadBalancerInBound",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "*",
+              "sourceAddressPrefix": "AzureLoadBalancer",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 300,
+              "direction": "Inbound"
+            }
+          },
+          {
+            "name": "AllowRdpOut",
+            "properties": {
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "3389",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1200,
+              "direction": "Outbound"
+            }
+          }
+        ]
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "apiVersion": "2015-05-01-preview",
+      "type": "Microsoft.Network/loadBalancers",
+      "name": "[parameters('ilbName')]",
+      "location": "[parameters('location')]",
+      "dependsOn": [
+        "[variables('ADFSVMVnetID')]"
+      ],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "properties": {
+              "subnet": {
+                "id": "[variables('ADFSVMSubnetRef')]"
+              },
+              "privateIPAddress": "[parameters('ilbIPAddress')]",
+              "privateIPAllocationMethod": "Static"
+            },
+            "name": "LoadBalancerFrontend"
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "BackendPool1"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "http-443",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('ilbName')), '/frontendIpConfigurations/LoadBalancerFrontend')]"
+              },
+              "frontendPort": 443,
+              "backendPort": 443,
+              "enableFloatingIP": false,
+              "idleTimeoutInMinutes": 5,
+              "protocol": "Tcp",
+              "loadDistribution": "Default",
+              "backendAddressPool": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('ilbName')), '/backendAddressPools/BackendPool1')]"
+              },
+              "probe": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('ilbName')), '/probes/lbadfsprobe')]"
+              }
+            },
+            "Name": "lbrule"
+          }
+        ],
+        "probes": [
+          {
+            "properties": {
+              "protocol": "Http",
+              "port": 80,
+              "requestPath": "/adfs/probe/",
+              "intervalInSeconds": 10,
+              "numberOfProbes": 2
+            },
+            "name": "lbadfsprobe"
+          }
+        ]
+      }
+    },
+    {
+      "name": "[parameters('addsstorageaccountname')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[parameters('location')]",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "[parameters('adddsstorageaccountType')]"
+      },
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "adddsstorageaccount"
+      },
+      "kind": "Storage",
+      "properties": {
+        "encryption": {
+          "keySource": "Microsoft.Storage",
+          "services": {
+            "blob": {
+              "enabled": true
+            }
+          }
+        }
+      }
+    },
+
+    {
+      "name": "[parameters('diagstorageaccountname')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "location": "[parameters('location')]",
+      "apiVersion": "2016-01-01",
+      "sku": {
+        "name": "[parameters('diagstorageaccountType')]"
+      },
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "diagstorageaccount"
+      },
+      "kind": "Storage",
+      "properties": {
+        "encryption": {
+          "keySource": "Microsoft.Storage",
+          "services": {
+            "blob": {
+              "enabled": true
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "[parameters('ADDSAvailablitysetName')]",
+      "type": "Microsoft.Compute/availabilitySets",
+      "sku": {
+        "name": "Classic"
+      },
+      "location": "[parameters('location')]",
+      "apiVersion": "2016-04-30-preview",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "ADDSAvailablityset"
+      },
+      "properties": {
+        "platformUpdateDomainCount": 5,
+        "platformFaultDomainCount": 3,
+        "virtualMachines": [ ]
+      }
+    },
+    {
+      "name": "[parameters('ADFSAvailablitysetName')]",
+      "type": "Microsoft.Compute/availabilitySets",
+      "sku": {
+        "name": "Aligned"
+      },
+      "location": "[parameters('location')]",
+      "apiVersion": "2016-04-30-preview",
+      "dependsOn": [ ],
+      "tags": {
+        "displayName": "ADFSAvailablityset"
+      },
+      "properties": {
+        "platformUpdateDomainCount": 5,
+        "platformFaultDomainCount": 3,
+        "virtualMachines": [ ]
+      }
+    },
+    {
+      "name": "[Parameters('Identity Virtual Network Name')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "location": "[parameters('location')]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('ADDSNSGName'))]",
+        "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('ADFSNSGName'))]"
+      ],
+      "tags": {
+        "displayName": "Identity Vnet"
+      },
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[Parameters('Identity VnetPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "GatewaySubnet",
+            "properties": {
+              "addressPrefix": "[Parameters('Gateway Subnet Prefix')]"
+            }
+          },
+          {
+            "name": "[parameters('ADDS Subnet Name')]",
+            "properties": {
+              "addressPrefix": "[parameters('ADDS Subnet Prefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('ADDSNSGName'))]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('ADFS Subnet Name')]",
+            "properties": {
+              "addressPrefix": "[parameters('ADFS Subnet Prefix')]",
+              "networkSecurityGroup": {
+                "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('ADFSNSGName'))]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[concat(parameters('addsVNamePrefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-nic')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "ADDSNICLoop",
+        "count": "[variables('numberOfInstances')]"
+      },
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', Parameters('Identity Virtual Network Name'))]"
+
+      ],
+      "tags": {
+        "displayName": "ADDSVMNic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('ADDSVMSubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "[concat(parameters('addsVNamePrefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'))]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "addsCopy",
+        "count": "[variables('numberOfInstances')]"
+      },
+      "apiVersion": "2015-06-15",
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('addsstorageaccountname'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('diagstorageaccountname'))]",
+        "[concat(parameters('addsVNamePrefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-nic')]",
+        "[concat('Microsoft.Compute/availabilitySets/', parameters('ADDSAvailablitysetName'))]"
+      ],
+      "tags": {
+        "displayName": "ADDSVM"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('ADDSVNSize')]"
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('ADDSAvailablitysetName'))]"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('addsVNamePrefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'))]",
+          "adminUsername": "[parameters('ADDSVMAdminUserName')]",
+          "adminPassword": "[parameters('ADDSVMAdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('ADDSVMImagePublisher')]",
+            "offer": "[variables('ADDSVMImageOffer')]",
+            "sku": "[parameters('ADDSVMWindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(parameters('addsVNamePrefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-OSDisk')]",
+            "vhd": {
+              "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', parameters('addsstorageaccountname')), '2016-01-01').primaryEndpoints.blob, variables('ADDSVMStorageAccountContainerName'), '/', concat(parameters('addsVNamePrefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-OSDisk'), '.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "lun": 0,
+              "name": "[concat(parameters('addsVNamePrefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-dataDisk')]",
+              "createOption": "Empty",
+              "vhd": {
+                "uri": "[concat(reference(resourceId('Microsoft.Storage/storageAccounts', parameters('addsstorageaccountname')), '2016-01-01').primaryEndpoints.blob, variables('ADDSVMStorageAccountContainerName'), '/', concat(parameters('addsVNamePrefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-dataDisk'), '.vhd')]"
+              },
+              "caching": "None",
+              "diskSizeGB": 32
+            }
+          ]
+        },
+
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('addsVNamePrefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-nic'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[concat('http://',parameters('DiagstorageaccountName'),'.blob.core.windows.net')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat(parameters('adfsVNamerefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-nic')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "ADFSNICLoop",
+        "count": "[variables('numberOfInstances')]"
+      },
+      "apiVersion": "2016-03-30",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', Parameters('Identity Virtual Network Name'))]",
+        "[resourceId('Microsoft.Network/loadBalancers', parameters('ilbName'))]"
+      ],
+      "tags": {
+        "displayName": "ADFSVMNic"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[variables('ADFSVMSubnetRef')]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[concat(resourceId('Microsoft.Network/loadBalancers', parameters('ilbName')), '/backendAddressPools/BackendPool1')]"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/disks",
+      "name": "[concat(parameters('adfsVNamerefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-datadisk')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "datacopy",
+        "count": "[variables('numberOfInstances')]"
+      },
+      "properties": {
+        "creationData": {
+          "createOption": "Empty"
+        },
+        "accountType": "[variables('storageAccountType')]",
+        "diskSizeGB": 32
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[concat(parameters('adfsVNamerefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'))]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[parameters('location')]",
+      "copy": {
+        "name": "wapCopy",
+        "count": "[variables('numberOfInstances')]"
+      },
+      "tags": {
+        "displayName": "ADFSVM"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('addsstorageaccountname'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('diagstorageaccountname'))]",
+        "[concat(parameters('adfsVNamerefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-nic')]",
+        "[concat('Microsoft.Compute/availabilitySets/', parameters('ADDSAvailablitysetName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('ADFSVNSize')]"
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('ADFSAvailablitysetName'))]"
+        },
+        "osProfile": {
+          "computerName": "[concat(parameters('adfsVNamerefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'))]",
+          "adminUsername": "[parameters('ADFSVMAdminUserName')]",
+          "adminPassword": "[parameters('ADFSVMAdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('ADDSVMImagePublisher')]",
+            "offer": "[variables('ADDSVMImageOffer')]",
+            "sku": "[parameters('ADDSVMWindowsOSVersion')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(parameters('adfsVNamerefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-osdisk')]",
+            "createOption": "FromImage"
+          },
+          "dataDisks": [
+            {
+              "lun": 2,
+              "name": "[concat(parameters('adfsVNamerefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-datadisk')]",
+              "createOption": "Attach",
+              "managedDisk": {
+                "id": "[resourceId('Microsoft.Compute/disks', concat(parameters('adfsVNamerefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-datadisk'))]"
+              }
+            }
+
+          ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',concat(parameters('adfsVNamerefix'),padleft(copyIndex(1),2,'0'),parameters('Environment'),'-nic'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[concat('http://',parameters('DiagstorageaccountName'),'.blob.core.windows.net')]"
+          }
+        }
+      }
+    }
+  ],
+  "outputs": { }
+}

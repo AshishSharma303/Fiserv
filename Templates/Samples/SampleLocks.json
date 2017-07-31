@@ -1,0 +1,921 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "availabilitySets_hcfliteavset_name": {
+      "defaultValue": "hcfliteavset",
+      "type": "String"
+    },
+    "disks_hcflite_osdisk_1_name": {
+      "defaultValue": "hcflite-osdisk-1",
+      "type": "String"
+    },
+    "disks_hcflite_osdisk_2_name": {
+      "defaultValue": "hcflite-osdisk-2",
+      "type": "String"
+    },
+    "disks_hcflite_osdisk_3_name": {
+      "defaultValue": "hcflite-osdisk-3",
+      "type": "String"
+    },
+    "disks_hcflite_vm_1_datadisk_0_name": {
+      "defaultValue": "hcflite-vm-1-datadisk-0",
+      "type": "String"
+    },
+    "disks_hcflite_vm_1_datadisk_1_name": {
+      "defaultValue": "hcflite-vm-1-datadisk-1",
+      "type": "String"
+    },
+    "disks_hcflite_vm_2_datadisk_0_name": {
+      "defaultValue": "hcflite-vm-2-datadisk-0",
+      "type": "String"
+    },
+    "disks_hcflite_vm_2_datadisk_1_name": {
+      "defaultValue": "hcflite-vm-2-datadisk-1",
+      "type": "String"
+    },
+    "disks_hcflite_vm_3_datadisk_0_name": {
+      "defaultValue": "hcflite-vm-3-datadisk-0",
+      "type": "String"
+    },
+    "disks_hcflite_vm_3_datadisk_1_name": {
+      "defaultValue": "hcflite-vm-3-datadisk-1",
+      "type": "String"
+    },
+    "virtualMachines_hcflite_vm_1_name": {
+      "defaultValue": "hcflite-vm-1",
+      "type": "String"
+    },
+    "virtualMachines_hcflite_vm_2_name": {
+      "defaultValue": "hcflite-vm-2",
+      "type": "String"
+    },
+    "virtualMachines_hcflite_vm_3_name": {
+      "defaultValue": "hcflite-vm-3",
+      "type": "String"
+    },
+    "loadBalancers_hcf_lb_external_name": {
+      "defaultValue": "hcf-lb-external",
+      "type": "String"
+    },
+    "networkInterfaces_hcflite_nic_1_name": {
+      "defaultValue": "hcflite-nic-1",
+      "type": "String"
+    },
+    "networkInterfaces_hcflite_nic_2_name": {
+      "defaultValue": "hcflite-nic-2",
+      "type": "String"
+    },
+    "networkInterfaces_hcflite_nic_3_name": {
+      "defaultValue": "hcflite-nic-3",
+      "type": "String"
+    },
+    "publicIPAddresses_hcf_public_lb_ip_name": {
+      "defaultValue": "hcf-public-lb-ip",
+      "type": "String"
+    },
+    "virtualNetworks_hcflite_vnet_name": {
+      "defaultValue": "hcflite-vnet",
+      "type": "String"
+    },
+    "storageAccounts_hcfdiagsac22xrivwvrv64_name": {
+      "defaultValue": "hcfdiagsac22xrivwvrv64",
+      "type": "String"
+    },
+    "extensions_Microsoft.Insights.VMDiagnosticsSettings_name": {
+      "defaultValue": "hcflite-vm-1/Microsoft.Insights.VMDiagnosticsSettings",
+      "type": "String"
+    },
+    "extensions_Microsoft.Insights.VMDiagnosticsSettings_name_1": {
+      "defaultValue": "hcflite-vm-2/Microsoft.Insights.VMDiagnosticsSettings",
+      "type": "String"
+    },
+    "extensions_Microsoft.Insights.VMDiagnosticsSettings_name_2": {
+      "defaultValue": "hcflite-vm-3/Microsoft.Insights.VMDiagnosticsSettings",
+      "type": "String"
+    },
+    "loadBalancers_hcf_lb_external_id": {
+      "defaultValue": "/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/loadBalancers/hcf-lb-external/frontendIPConfigurations/LoadBalancerFrontend",
+      "type": "String"
+    },
+    "loadBalancers_hcf_lb_external_id_1": {
+      "defaultValue": "/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/loadBalancers/hcf-lb-external/frontendIPConfigurations/LoadBalancerFrontend",
+      "type": "String"
+    },
+    "loadBalancers_hcf_lb_external_id_2": {
+      "defaultValue": "/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/loadBalancers/hcf-lb-external/frontendIPConfigurations/LoadBalancerFrontend",
+      "type": "String"
+    }
+  },
+  "variables": { },
+  "resources": [
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/availabilitySets/hcfliteavset'.",
+      "type": "Microsoft.Compute/availabilitySets",
+      "sku": {
+        "name": "Aligned"
+      },
+      "name": "[parameters('availabilitySets_hcfliteavset_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "scale": null,
+      "properties": {
+        "platformUpdateDomainCount": 2,
+        "platformFaultDomainCount": 2,
+        "virtualMachines": [
+          {
+            "id": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_hcflite_vm_1_name'))]"
+          },
+          {
+            "id": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_hcflite_vm_2_name'))]"
+          },
+          {
+            "id": "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_hcflite_vm_3_name'))]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_hcflite_vm_1_name'))]",
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_hcflite_vm_2_name'))]",
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_hcflite_vm_3_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/hcflite-osdisk-1'.",
+      "type": "Microsoft.Compute/disks",
+      "name": "[parameters('disks_hcflite_osdisk_1_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "accountType": "Premium_LRS",
+        "osType": "Windows",
+        "creationData": {
+          "createOption": "FromImage",
+          "imageReference": {
+            "id": "/Subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/Providers/Microsoft.Compute/Locations/eastus2/Publishers/MicrosoftWindowsServer/ArtifactTypes/VMImage/Offers/WindowsServer/Skus/2016-Datacenter/Versions/latest"
+          }
+        },
+        "diskSizeGB": 128
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/hcflite-osdisk-2'.",
+      "type": "Microsoft.Compute/disks",
+      "name": "[parameters('disks_hcflite_osdisk_2_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "accountType": "Premium_LRS",
+        "osType": "Windows",
+        "creationData": {
+          "createOption": "FromImage",
+          "imageReference": {
+            "id": "/Subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/Providers/Microsoft.Compute/Locations/eastus2/Publishers/MicrosoftWindowsServer/ArtifactTypes/VMImage/Offers/WindowsServer/Skus/2016-Datacenter/Versions/latest"
+          }
+        },
+        "diskSizeGB": 128
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/hcflite-osdisk-3'.",
+      "type": "Microsoft.Compute/disks",
+      "name": "[parameters('disks_hcflite_osdisk_3_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "accountType": "Premium_LRS",
+        "osType": "Windows",
+        "creationData": {
+          "createOption": "FromImage",
+          "imageReference": {
+            "id": "/Subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/Providers/Microsoft.Compute/Locations/eastus2/Publishers/MicrosoftWindowsServer/ArtifactTypes/VMImage/Offers/WindowsServer/Skus/2016-Datacenter/Versions/latest"
+          }
+        },
+        "diskSizeGB": 128
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/hcflite-vm-1-datadisk-0'.",
+      "type": "Microsoft.Compute/disks",
+      "name": "[parameters('disks_hcflite_vm_1_datadisk_0_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "scale": null,
+      "properties": {
+        "accountType": "Standard_LRS",
+        "creationData": {
+          "createOption": "Empty"
+        },
+        "diskSizeGB": 128
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/hcflite-vm-1-datadisk-1'.",
+      "type": "Microsoft.Compute/disks",
+      "name": "[parameters('disks_hcflite_vm_1_datadisk_1_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "scale": null,
+      "properties": {
+        "accountType": "Standard_LRS",
+        "creationData": {
+          "createOption": "Empty"
+        },
+        "diskSizeGB": 128
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/hcflite-vm-2-datadisk-0'.",
+      "type": "Microsoft.Compute/disks",
+      "name": "[parameters('disks_hcflite_vm_2_datadisk_0_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "scale": null,
+      "properties": {
+        "accountType": "Standard_LRS",
+        "creationData": {
+          "createOption": "Empty"
+        },
+        "diskSizeGB": 128
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/hcflite-vm-2-datadisk-1'.",
+      "type": "Microsoft.Compute/disks",
+      "name": "[parameters('disks_hcflite_vm_2_datadisk_1_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "scale": null,
+      "properties": {
+        "accountType": "Standard_LRS",
+        "creationData": {
+          "createOption": "Empty"
+        },
+        "diskSizeGB": 128
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/hcflite-vm-3-datadisk-0'.",
+      "type": "Microsoft.Compute/disks",
+      "name": "[parameters('disks_hcflite_vm_3_datadisk_0_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "scale": null,
+      "properties": {
+        "accountType": "Standard_LRS",
+        "creationData": {
+          "createOption": "Empty"
+        },
+        "diskSizeGB": 128
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/hcflite-vm-3-datadisk-1'.",
+      "type": "Microsoft.Compute/disks",
+      "name": "[parameters('disks_hcflite_vm_3_datadisk_1_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "scale": null,
+      "properties": {
+        "accountType": "Standard_LRS",
+        "creationData": {
+          "createOption": "Empty"
+        },
+        "diskSizeGB": 128
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/virtualMachines/hcflite-vm-1'.",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('virtualMachines_hcflite_vm_1_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySets_hcfliteavset_name'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "Standard_DS1_v2"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2016-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "osType": "Windows",
+            "name": "hcflite-osdisk-1",
+            "createOption": "FromImage",
+            "caching": "ReadWrite",
+            "managedDisk": {
+              "storageAccountType": "Premium_LRS",
+              "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_osdisk_1_name'))]"
+            },
+            "diskSizeGB": 128
+          },
+          "dataDisks": [
+            {
+              "lun": 0,
+              "name": "[concat(parameters('virtualMachines_hcflite_vm_1_name'),'-datadisk-0')]",
+              "createOption": "Attach",
+              "caching": "ReadWrite",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS",
+                "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_1_datadisk_0_name'))]"
+              },
+              "diskSizeGB": 128
+            },
+            {
+              "lun": 1,
+              "name": "[concat(parameters('virtualMachines_hcflite_vm_1_name'),'-datadisk-1')]",
+              "createOption": "Attach",
+              "caching": "ReadWrite",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS",
+                "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_1_datadisk_1_name'))]"
+              },
+              "diskSizeGB": 128
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[parameters('virtualMachines_hcflite_vm_1_name')]",
+          "adminUsername": "azureadmin",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": true
+          },
+          "secrets": [ ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_hcflite_nic_1_name'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[concat('https', '://', parameters('storageAccounts_hcfdiagsac22xrivwvrv64_name'), '.blob.core.windows.net', '/')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySets_hcfliteavset_name'))]",
+        "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_osdisk_1_name'))]",
+        "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_1_datadisk_0_name'))]",
+        "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_1_datadisk_1_name'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_hcflite_nic_1_name'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_hcfdiagsac22xrivwvrv64_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/virtualMachines/hcflite-vm-2'.",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('virtualMachines_hcflite_vm_2_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySets_hcfliteavset_name'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "Standard_DS1_v2"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2016-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "osType": "Windows",
+            "name": "hcflite-osdisk-2",
+            "createOption": "FromImage",
+            "caching": "ReadWrite",
+            "managedDisk": {
+              "storageAccountType": "Premium_LRS",
+              "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_osdisk_2_name'))]"
+            },
+            "diskSizeGB": 128
+          },
+          "dataDisks": [
+            {
+              "lun": 0,
+              "name": "[concat(parameters('virtualMachines_hcflite_vm_2_name'),'-datadisk-0')]",
+              "createOption": "Attach",
+              "caching": "ReadWrite",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS",
+                "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_2_datadisk_0_name'))]"
+              },
+              "diskSizeGB": 128
+            },
+            {
+              "lun": 1,
+              "name": "[concat(parameters('virtualMachines_hcflite_vm_2_name'),'-datadisk-1')]",
+              "createOption": "Attach",
+              "caching": "ReadWrite",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS",
+                "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_2_datadisk_1_name'))]"
+              },
+              "diskSizeGB": 128
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[parameters('virtualMachines_hcflite_vm_2_name')]",
+          "adminUsername": "azureadmin",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": true
+          },
+          "secrets": [ ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_hcflite_nic_2_name'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[concat('https', '://', parameters('storageAccounts_hcfdiagsac22xrivwvrv64_name'), '.blob.core.windows.net', '/')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySets_hcfliteavset_name'))]",
+        "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_osdisk_2_name'))]",
+        "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_2_datadisk_0_name'))]",
+        "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_2_datadisk_1_name'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_hcflite_nic_2_name'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_hcfdiagsac22xrivwvrv64_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/virtualMachines/hcflite-vm-3'.",
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('virtualMachines_hcflite_vm_3_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySets_hcfliteavset_name'))]"
+        },
+        "hardwareProfile": {
+          "vmSize": "Standard_DS1_v2"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "MicrosoftWindowsServer",
+            "offer": "WindowsServer",
+            "sku": "2016-Datacenter",
+            "version": "latest"
+          },
+          "osDisk": {
+            "osType": "Windows",
+            "name": "hcflite-osdisk-3",
+            "createOption": "FromImage",
+            "caching": "ReadWrite",
+            "managedDisk": {
+              "storageAccountType": "Premium_LRS",
+              "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_osdisk_3_name'))]"
+            },
+            "diskSizeGB": 128
+          },
+          "dataDisks": [
+            {
+              "lun": 0,
+              "name": "[concat(parameters('virtualMachines_hcflite_vm_3_name'),'-datadisk-0')]",
+              "createOption": "Attach",
+              "caching": "ReadWrite",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS",
+                "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_3_datadisk_0_name'))]"
+              },
+              "diskSizeGB": 128
+            },
+            {
+              "lun": 1,
+              "name": "[concat(parameters('virtualMachines_hcflite_vm_3_name'),'-datadisk-1')]",
+              "createOption": "Attach",
+              "caching": "ReadWrite",
+              "managedDisk": {
+                "storageAccountType": "Standard_LRS",
+                "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_3_datadisk_1_name'))]"
+              },
+              "diskSizeGB": 128
+            }
+          ]
+        },
+        "osProfile": {
+          "computerName": "[parameters('virtualMachines_hcflite_vm_3_name')]",
+          "adminUsername": "azureadmin",
+          "windowsConfiguration": {
+            "provisionVMAgent": true,
+            "enableAutomaticUpdates": true
+          },
+          "secrets": [ ]
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_hcflite_nic_3_name'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true,
+            "storageUri": "[concat('https', '://', parameters('storageAccounts_hcfdiagsac22xrivwvrv64_name'), '.blob.core.windows.net', '/')]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySets_hcfliteavset_name'))]",
+        "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_osdisk_3_name'))]",
+        "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_3_datadisk_0_name'))]",
+        "[resourceId('Microsoft.Compute/disks', parameters('disks_hcflite_vm_3_datadisk_1_name'))]",
+        "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_hcflite_nic_3_name'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_hcfdiagsac22xrivwvrv64_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/loadBalancers/hcf-lb-external'.",
+      "type": "Microsoft.Network/loadBalancers",
+      "name": "[parameters('loadBalancers_hcf_lb_external_name')]",
+      "apiVersion": "2017-03-01",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "LoadBalancerFrontend",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_hcf_public_lb_ip_name'))]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "LoadBalancerBackend"
+          }
+        ],
+        "loadBalancingRules": [ ],
+        "probes": [ ],
+        "inboundNatRules": [
+          {
+            "name": "RDP-VM1",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[parameters('loadBalancers_hcf_lb_external_id')]"
+              },
+              "frontendPort": 5001,
+              "backendPort": 3389,
+              "protocol": "Tcp"
+            }
+          },
+          {
+            "name": "RDP-VM0",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[parameters('loadBalancers_hcf_lb_external_id_1')]"
+              },
+              "frontendPort": 5000,
+              "backendPort": 3389,
+              "protocol": "Tcp"
+            }
+          },
+          {
+            "name": "RDP-VM2",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[parameters('loadBalancers_hcf_lb_external_id_2')]"
+              },
+              "frontendPort": 5002,
+              "backendPort": 3389,
+              "protocol": "Tcp"
+            }
+          }
+        ],
+        "outboundNatRules": [ ],
+        "inboundNatPools": [ ]
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_hcf_public_lb_ip_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/networkInterfaces/hcflite-nic-1'.",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[parameters('networkInterfaces_hcflite_nic_1_name')]",
+      "apiVersion": "2017-03-01",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAddress": "10.0.20.4",
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_hcflite_vnet_name')), '/subnets/hcflite-subnet-app')]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [ ]
+        },
+        "enableIPForwarding": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_hcflite_vnet_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/networkInterfaces/hcflite-nic-2'.",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[parameters('networkInterfaces_hcflite_nic_2_name')]",
+      "apiVersion": "2017-03-01",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAddress": "10.0.20.5",
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_hcflite_vnet_name')), '/subnets/hcflite-subnet-app')]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [ ]
+        },
+        "enableIPForwarding": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_hcflite_vnet_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/networkInterfaces/hcflite-nic-3'.",
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[parameters('networkInterfaces_hcflite_nic_3_name')]",
+      "apiVersion": "2017-03-01",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAddress": "10.0.20.6",
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_hcflite_vnet_name')), '/subnets/hcflite-subnet-app')]"
+              }
+            }
+          }
+        ],
+        "dnsSettings": {
+          "dnsServers": [ ]
+        },
+        "enableIPForwarding": false
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_hcflite_vnet_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/publicIPAddresses/hcf-public-lb-ip'.",
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('publicIPAddresses_hcf_public_lb_ip_name')]",
+      "apiVersion": "2017-03-01",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "idleTimeoutInMinutes": 4,
+        "dnsSettings": {
+          "domainNameLabel": "hcf-remoteconnect"
+        }
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/virtualNetworks/hcflite-vnet'.",
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[parameters('virtualNetworks_hcflite_vnet_name')]",
+      "apiVersion": "2017-03-01",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "owner": "owner",
+        "costCenter": "CC"
+      },
+      "scale": null,
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "hcflite-subnet-gw",
+            "properties": {
+              "addressPrefix": "10.0.10.0/24"
+            }
+          },
+          {
+            "name": "hcflite-subnet-app",
+            "properties": {
+              "addressPrefix": "10.0.20.0/24"
+            }
+          },
+          {
+            "name": "hcflite-subnet-be",
+            "properties": {
+              "addressPrefix": "10.0.30.0/24"
+            }
+          }
+        ],
+        "virtualNetworkPeerings": [ ]
+      },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/hcf-lite/providers/Microsoft.Storage/storageAccounts/hcfdiagsac22xrivwvrv64'.",
+      "type": "Microsoft.Storage/storageAccounts",
+      "sku": {
+        "name": "Standard_LRS",
+        "tier": "Standard"
+      },
+      "kind": "Storage",
+      "name": "[parameters('storageAccounts_hcfdiagsac22xrivwvrv64_name')]",
+      "apiVersion": "2016-01-01",
+      "location": "eastus2",
+      "tags": {
+        "businessUnit": "BU",
+        "costCenter": "CC",
+        "owner": "owner"
+      },
+      "scale": null,
+      "properties": { },
+      "dependsOn": [ ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/virtualMachines/hcflite-vm-1/extensions/Microsoft.Insights.VMDiagnosticsSettings'.",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[parameters('extensions_Microsoft.Insights.VMDiagnosticsSettings_name')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "scale": null,
+      "properties": {
+        "publisher": "Microsoft.Azure.Diagnostics",
+        "type": "IaaSDiagnostics",
+        "typeHandlerVersion": "1.5",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "xmlCfg": "PFdhZENmZz4gPERpYWdub3N0aWNNb25pdG9yQ29uZmlndXJhdGlvbiBvdmVyYWxsUXVvdGFJbk1CPSI0MDk2IiB4bWxucz0iaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS9TZXJ2aWNlSG9zdGluZy8yMDEwLzEwL0RpYWdub3N0aWNzQ29uZmlndXJhdGlvbiI+IDxEaWFnbm9zdGljSW5mcmFzdHJ1Y3R1cmVMb2dzIHNjaGVkdWxlZFRyYW5zZmVyTG9nTGV2ZWxGaWx0ZXI9IkVycm9yIi8+IDxXaW5kb3dzRXZlbnRMb2cgc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMU0iID4gPERhdGFTb3VyY2UgbmFtZT0iQXBwbGljYXRpb24hKltTeXN0ZW1bKExldmVsID0gMSBvciBMZXZlbCA9IDIpXV0iIC8+IDxEYXRhU291cmNlIG5hbWU9IlNlY3VyaXR5ISpbU3lzdGVtWyhMZXZlbCA9IDEgb3IgTGV2ZWwgPSAyKV1dIiAvPiA8RGF0YVNvdXJjZSBuYW1lPSJTeXN0ZW0hKltTeXN0ZW1bKExldmVsID0gMSBvciBMZXZlbCA9IDIpXV0iIC8+PC9XaW5kb3dzRXZlbnRMb2c+PFBlcmZvcm1hbmNlQ291bnRlcnMgc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMU0iPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQcm9jZXNzb3IoX1RvdGFsKVwlIFByb2Nlc3NvciBUaW1lIiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iUGVyY2VudCI+PGFubm90YXRpb24gZGlzcGxheU5hbWU9IkNQVSB1dGlsaXphdGlvbiIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUHJvY2Vzc29yKF9Ub3RhbClcJSBQcml2aWxlZ2VkIFRpbWUiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iQ1BVIHByaXZpbGVnZWQgdGltZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUHJvY2Vzc29yKF9Ub3RhbClcJSBVc2VyIFRpbWUiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iQ1BVIHVzZXIgdGltZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUHJvY2Vzc29yIEluZm9ybWF0aW9uKF9Ub3RhbClcUHJvY2Vzc29yIEZyZXF1ZW5jeSIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iQ1BVIGZyZXF1ZW5jeSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcU3lzdGVtXFByb2Nlc3NlcyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iUHJvY2Vzc2VzIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQcm9jZXNzKF9Ub3RhbClcVGhyZWFkIENvdW50IiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iQ291bnQiPjxhbm5vdGF0aW9uIGRpc3BsYXlOYW1lPSJUaHJlYWRzIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQcm9jZXNzKF9Ub3RhbClcSGFuZGxlIENvdW50IiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iQ291bnQiPjxhbm5vdGF0aW9uIGRpc3BsYXlOYW1lPSJIYW5kbGVzIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxNZW1vcnlcJSBDb21taXR0ZWQgQnl0ZXMgSW4gVXNlIiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iUGVyY2VudCI+PGFubm90YXRpb24gZGlzcGxheU5hbWU9Ik1lbW9yeSB1c2FnZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTWVtb3J5XEF2YWlsYWJsZSBCeXRlcyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iTWVtb3J5IGF2YWlsYWJsZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTWVtb3J5XENvbW1pdHRlZCBCeXRlcyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iTWVtb3J5IGNvbW1pdHRlZCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTWVtb3J5XENvbW1pdCBMaW1pdCIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iTWVtb3J5IGNvbW1pdCBsaW1pdCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUGh5c2ljYWxEaXNrKF9Ub3RhbClcJSBEaXNrIFRpbWUiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBhY3RpdmUgdGltZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUGh5c2ljYWxEaXNrKF9Ub3RhbClcJSBEaXNrIFJlYWQgVGltZSIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IlBlcmNlbnQiPjxhbm5vdGF0aW9uIGRpc3BsYXlOYW1lPSJEaXNrIGFjdGl2ZSByZWFkIHRpbWUiIGxvY2FsZT0iZW4tdXMiLz48L1BlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24+PFBlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24gY291bnRlclNwZWNpZmllcj0iXFBoeXNpY2FsRGlzayhfVG90YWwpXCUgRGlzayBXcml0ZSBUaW1lIiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iUGVyY2VudCI+PGFubm90YXRpb24gZGlzcGxheU5hbWU9IkRpc2sgYWN0aXZlIHdyaXRlIHRpbWUiIGxvY2FsZT0iZW4tdXMiLz48L1BlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24+PFBlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24gY291bnRlclNwZWNpZmllcj0iXFBoeXNpY2FsRGlzayhfVG90YWwpXERpc2sgVHJhbnNmZXJzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50UGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBvcGVyYXRpb25zIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQaHlzaWNhbERpc2soX1RvdGFsKVxEaXNrIFJlYWRzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50UGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayByZWFkIG9wZXJhdGlvbnMiIGxvY2FsZT0iZW4tdXMiLz48L1BlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24+PFBlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24gY291bnRlclNwZWNpZmllcj0iXFBoeXNpY2FsRGlzayhfVG90YWwpXERpc2sgV3JpdGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50UGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayB3cml0ZSBvcGVyYXRpb25zIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQaHlzaWNhbERpc2soX1RvdGFsKVxEaXNrIEJ5dGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzUGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBzcGVlZCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUGh5c2ljYWxEaXNrKF9Ub3RhbClcRGlzayBSZWFkIEJ5dGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzUGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayByZWFkIHNwZWVkIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQaHlzaWNhbERpc2soX1RvdGFsKVxEaXNrIFdyaXRlIEJ5dGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzUGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayB3cml0ZSBzcGVlZCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTG9naWNhbERpc2soX1RvdGFsKVwlIEZyZWUgU3BhY2UiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBmcmVlIHNwYWNlIChwZXJjZW50YWdlKSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48L1BlcmZvcm1hbmNlQ291bnRlcnM+PE1ldHJpY3MgcmVzb3VyY2VJZD0iL3N1YnNjcmlwdGlvbnMvZTNkNWE3MTUtZmQyOS00NTA5LTlkYWMtNWNhN2Y0OWZiMWEwL3Jlc291cmNlR3JvdXBzL0hDRi1MaXRlL3Byb3ZpZGVycy9NaWNyb3NvZnQuQ29tcHV0ZS92aXJ0dWFsTWFjaGluZXMvIj48TWV0cmljQWdncmVnYXRpb24gc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMUgiLz48TWV0cmljQWdncmVnYXRpb24gc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMU0iLz48L01ldHJpY3M+PC9EaWFnbm9zdGljTW9uaXRvckNvbmZpZ3VyYXRpb24+PC9XYWRDZmc+",
+          "StorageAccount": "hcfdiagsac22xrivwvrv64"
+        },
+        "protectedSettings": { }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_hcflite_vm_1_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/virtualMachines/hcflite-vm-2/extensions/Microsoft.Insights.VMDiagnosticsSettings'.",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[parameters('extensions_Microsoft.Insights.VMDiagnosticsSettings_name_1')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "scale": null,
+      "properties": {
+        "publisher": "Microsoft.Azure.Diagnostics",
+        "type": "IaaSDiagnostics",
+        "typeHandlerVersion": "1.5",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "xmlCfg": "PFdhZENmZz4gPERpYWdub3N0aWNNb25pdG9yQ29uZmlndXJhdGlvbiBvdmVyYWxsUXVvdGFJbk1CPSI0MDk2IiB4bWxucz0iaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS9TZXJ2aWNlSG9zdGluZy8yMDEwLzEwL0RpYWdub3N0aWNzQ29uZmlndXJhdGlvbiI+IDxEaWFnbm9zdGljSW5mcmFzdHJ1Y3R1cmVMb2dzIHNjaGVkdWxlZFRyYW5zZmVyTG9nTGV2ZWxGaWx0ZXI9IkVycm9yIi8+IDxXaW5kb3dzRXZlbnRMb2cgc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMU0iID4gPERhdGFTb3VyY2UgbmFtZT0iQXBwbGljYXRpb24hKltTeXN0ZW1bKExldmVsID0gMSBvciBMZXZlbCA9IDIpXV0iIC8+IDxEYXRhU291cmNlIG5hbWU9IlNlY3VyaXR5ISpbU3lzdGVtWyhMZXZlbCA9IDEgb3IgTGV2ZWwgPSAyKV1dIiAvPiA8RGF0YVNvdXJjZSBuYW1lPSJTeXN0ZW0hKltTeXN0ZW1bKExldmVsID0gMSBvciBMZXZlbCA9IDIpXV0iIC8+PC9XaW5kb3dzRXZlbnRMb2c+PFBlcmZvcm1hbmNlQ291bnRlcnMgc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMU0iPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQcm9jZXNzb3IoX1RvdGFsKVwlIFByb2Nlc3NvciBUaW1lIiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iUGVyY2VudCI+PGFubm90YXRpb24gZGlzcGxheU5hbWU9IkNQVSB1dGlsaXphdGlvbiIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUHJvY2Vzc29yKF9Ub3RhbClcJSBQcml2aWxlZ2VkIFRpbWUiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iQ1BVIHByaXZpbGVnZWQgdGltZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUHJvY2Vzc29yKF9Ub3RhbClcJSBVc2VyIFRpbWUiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iQ1BVIHVzZXIgdGltZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUHJvY2Vzc29yIEluZm9ybWF0aW9uKF9Ub3RhbClcUHJvY2Vzc29yIEZyZXF1ZW5jeSIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iQ1BVIGZyZXF1ZW5jeSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcU3lzdGVtXFByb2Nlc3NlcyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iUHJvY2Vzc2VzIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQcm9jZXNzKF9Ub3RhbClcVGhyZWFkIENvdW50IiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iQ291bnQiPjxhbm5vdGF0aW9uIGRpc3BsYXlOYW1lPSJUaHJlYWRzIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQcm9jZXNzKF9Ub3RhbClcSGFuZGxlIENvdW50IiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iQ291bnQiPjxhbm5vdGF0aW9uIGRpc3BsYXlOYW1lPSJIYW5kbGVzIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxNZW1vcnlcJSBDb21taXR0ZWQgQnl0ZXMgSW4gVXNlIiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iUGVyY2VudCI+PGFubm90YXRpb24gZGlzcGxheU5hbWU9Ik1lbW9yeSB1c2FnZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTWVtb3J5XEF2YWlsYWJsZSBCeXRlcyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iTWVtb3J5IGF2YWlsYWJsZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTWVtb3J5XENvbW1pdHRlZCBCeXRlcyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iTWVtb3J5IGNvbW1pdHRlZCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTWVtb3J5XENvbW1pdCBMaW1pdCIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iTWVtb3J5IGNvbW1pdCBsaW1pdCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUGh5c2ljYWxEaXNrKF9Ub3RhbClcJSBEaXNrIFRpbWUiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBhY3RpdmUgdGltZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUGh5c2ljYWxEaXNrKF9Ub3RhbClcJSBEaXNrIFJlYWQgVGltZSIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IlBlcmNlbnQiPjxhbm5vdGF0aW9uIGRpc3BsYXlOYW1lPSJEaXNrIGFjdGl2ZSByZWFkIHRpbWUiIGxvY2FsZT0iZW4tdXMiLz48L1BlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24+PFBlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24gY291bnRlclNwZWNpZmllcj0iXFBoeXNpY2FsRGlzayhfVG90YWwpXCUgRGlzayBXcml0ZSBUaW1lIiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iUGVyY2VudCI+PGFubm90YXRpb24gZGlzcGxheU5hbWU9IkRpc2sgYWN0aXZlIHdyaXRlIHRpbWUiIGxvY2FsZT0iZW4tdXMiLz48L1BlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24+PFBlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24gY291bnRlclNwZWNpZmllcj0iXFBoeXNpY2FsRGlzayhfVG90YWwpXERpc2sgVHJhbnNmZXJzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50UGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBvcGVyYXRpb25zIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQaHlzaWNhbERpc2soX1RvdGFsKVxEaXNrIFJlYWRzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50UGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayByZWFkIG9wZXJhdGlvbnMiIGxvY2FsZT0iZW4tdXMiLz48L1BlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24+PFBlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24gY291bnRlclNwZWNpZmllcj0iXFBoeXNpY2FsRGlzayhfVG90YWwpXERpc2sgV3JpdGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50UGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayB3cml0ZSBvcGVyYXRpb25zIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQaHlzaWNhbERpc2soX1RvdGFsKVxEaXNrIEJ5dGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzUGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBzcGVlZCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUGh5c2ljYWxEaXNrKF9Ub3RhbClcRGlzayBSZWFkIEJ5dGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzUGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayByZWFkIHNwZWVkIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQaHlzaWNhbERpc2soX1RvdGFsKVxEaXNrIFdyaXRlIEJ5dGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzUGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayB3cml0ZSBzcGVlZCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTG9naWNhbERpc2soX1RvdGFsKVwlIEZyZWUgU3BhY2UiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBmcmVlIHNwYWNlIChwZXJjZW50YWdlKSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48L1BlcmZvcm1hbmNlQ291bnRlcnM+PE1ldHJpY3MgcmVzb3VyY2VJZD0iL3N1YnNjcmlwdGlvbnMvZTNkNWE3MTUtZmQyOS00NTA5LTlkYWMtNWNhN2Y0OWZiMWEwL3Jlc291cmNlR3JvdXBzL0hDRi1MaXRlL3Byb3ZpZGVycy9NaWNyb3NvZnQuQ29tcHV0ZS92aXJ0dWFsTWFjaGluZXMvIj48TWV0cmljQWdncmVnYXRpb24gc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMUgiLz48TWV0cmljQWdncmVnYXRpb24gc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMU0iLz48L01ldHJpY3M+PC9EaWFnbm9zdGljTW9uaXRvckNvbmZpZ3VyYXRpb24+PC9XYWRDZmc+",
+          "StorageAccount": "hcfdiagsac22xrivwvrv64"
+        },
+        "protectedSettings": { }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_hcflite_vm_2_name'))]"
+      ]
+    },
+    {
+      "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/virtualMachines/hcflite-vm-3/extensions/Microsoft.Insights.VMDiagnosticsSettings'.",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[parameters('extensions_Microsoft.Insights.VMDiagnosticsSettings_name_2')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "eastus2",
+      "scale": null,
+      "properties": {
+        "publisher": "Microsoft.Azure.Diagnostics",
+        "type": "IaaSDiagnostics",
+        "typeHandlerVersion": "1.5",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "xmlCfg": "PFdhZENmZz4gPERpYWdub3N0aWNNb25pdG9yQ29uZmlndXJhdGlvbiBvdmVyYWxsUXVvdGFJbk1CPSI0MDk2IiB4bWxucz0iaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS9TZXJ2aWNlSG9zdGluZy8yMDEwLzEwL0RpYWdub3N0aWNzQ29uZmlndXJhdGlvbiI+IDxEaWFnbm9zdGljSW5mcmFzdHJ1Y3R1cmVMb2dzIHNjaGVkdWxlZFRyYW5zZmVyTG9nTGV2ZWxGaWx0ZXI9IkVycm9yIi8+IDxXaW5kb3dzRXZlbnRMb2cgc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMU0iID4gPERhdGFTb3VyY2UgbmFtZT0iQXBwbGljYXRpb24hKltTeXN0ZW1bKExldmVsID0gMSBvciBMZXZlbCA9IDIpXV0iIC8+IDxEYXRhU291cmNlIG5hbWU9IlNlY3VyaXR5ISpbU3lzdGVtWyhMZXZlbCA9IDEgb3IgTGV2ZWwgPSAyKV1dIiAvPiA8RGF0YVNvdXJjZSBuYW1lPSJTeXN0ZW0hKltTeXN0ZW1bKExldmVsID0gMSBvciBMZXZlbCA9IDIpXV0iIC8+PC9XaW5kb3dzRXZlbnRMb2c+PFBlcmZvcm1hbmNlQ291bnRlcnMgc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMU0iPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQcm9jZXNzb3IoX1RvdGFsKVwlIFByb2Nlc3NvciBUaW1lIiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iUGVyY2VudCI+PGFubm90YXRpb24gZGlzcGxheU5hbWU9IkNQVSB1dGlsaXphdGlvbiIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUHJvY2Vzc29yKF9Ub3RhbClcJSBQcml2aWxlZ2VkIFRpbWUiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iQ1BVIHByaXZpbGVnZWQgdGltZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUHJvY2Vzc29yKF9Ub3RhbClcJSBVc2VyIFRpbWUiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iQ1BVIHVzZXIgdGltZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUHJvY2Vzc29yIEluZm9ybWF0aW9uKF9Ub3RhbClcUHJvY2Vzc29yIEZyZXF1ZW5jeSIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iQ1BVIGZyZXF1ZW5jeSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcU3lzdGVtXFByb2Nlc3NlcyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iUHJvY2Vzc2VzIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQcm9jZXNzKF9Ub3RhbClcVGhyZWFkIENvdW50IiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iQ291bnQiPjxhbm5vdGF0aW9uIGRpc3BsYXlOYW1lPSJUaHJlYWRzIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQcm9jZXNzKF9Ub3RhbClcSGFuZGxlIENvdW50IiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iQ291bnQiPjxhbm5vdGF0aW9uIGRpc3BsYXlOYW1lPSJIYW5kbGVzIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxNZW1vcnlcJSBDb21taXR0ZWQgQnl0ZXMgSW4gVXNlIiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iUGVyY2VudCI+PGFubm90YXRpb24gZGlzcGxheU5hbWU9Ik1lbW9yeSB1c2FnZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTWVtb3J5XEF2YWlsYWJsZSBCeXRlcyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iTWVtb3J5IGF2YWlsYWJsZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTWVtb3J5XENvbW1pdHRlZCBCeXRlcyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iTWVtb3J5IGNvbW1pdHRlZCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTWVtb3J5XENvbW1pdCBMaW1pdCIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iTWVtb3J5IGNvbW1pdCBsaW1pdCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUGh5c2ljYWxEaXNrKF9Ub3RhbClcJSBEaXNrIFRpbWUiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBhY3RpdmUgdGltZSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUGh5c2ljYWxEaXNrKF9Ub3RhbClcJSBEaXNrIFJlYWQgVGltZSIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IlBlcmNlbnQiPjxhbm5vdGF0aW9uIGRpc3BsYXlOYW1lPSJEaXNrIGFjdGl2ZSByZWFkIHRpbWUiIGxvY2FsZT0iZW4tdXMiLz48L1BlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24+PFBlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24gY291bnRlclNwZWNpZmllcj0iXFBoeXNpY2FsRGlzayhfVG90YWwpXCUgRGlzayBXcml0ZSBUaW1lIiBzYW1wbGVSYXRlPSJQVDE1UyIgdW5pdD0iUGVyY2VudCI+PGFubm90YXRpb24gZGlzcGxheU5hbWU9IkRpc2sgYWN0aXZlIHdyaXRlIHRpbWUiIGxvY2FsZT0iZW4tdXMiLz48L1BlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24+PFBlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24gY291bnRlclNwZWNpZmllcj0iXFBoeXNpY2FsRGlzayhfVG90YWwpXERpc2sgVHJhbnNmZXJzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50UGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBvcGVyYXRpb25zIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQaHlzaWNhbERpc2soX1RvdGFsKVxEaXNrIFJlYWRzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50UGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayByZWFkIG9wZXJhdGlvbnMiIGxvY2FsZT0iZW4tdXMiLz48L1BlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24+PFBlcmZvcm1hbmNlQ291bnRlckNvbmZpZ3VyYXRpb24gY291bnRlclNwZWNpZmllcj0iXFBoeXNpY2FsRGlzayhfVG90YWwpXERpc2sgV3JpdGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkNvdW50UGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayB3cml0ZSBvcGVyYXRpb25zIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQaHlzaWNhbERpc2soX1RvdGFsKVxEaXNrIEJ5dGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzUGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBzcGVlZCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcUGh5c2ljYWxEaXNrKF9Ub3RhbClcRGlzayBSZWFkIEJ5dGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzUGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayByZWFkIHNwZWVkIiBsb2NhbGU9ImVuLXVzIi8+PC9QZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uPjxQZXJmb3JtYW5jZUNvdW50ZXJDb25maWd1cmF0aW9uIGNvdW50ZXJTcGVjaWZpZXI9IlxQaHlzaWNhbERpc2soX1RvdGFsKVxEaXNrIFdyaXRlIEJ5dGVzL3NlYyIgc2FtcGxlUmF0ZT0iUFQxNVMiIHVuaXQ9IkJ5dGVzUGVyU2Vjb25kIj48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayB3cml0ZSBzcGVlZCIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48UGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbiBjb3VudGVyU3BlY2lmaWVyPSJcTG9naWNhbERpc2soX1RvdGFsKVwlIEZyZWUgU3BhY2UiIHNhbXBsZVJhdGU9IlBUMTVTIiB1bml0PSJQZXJjZW50Ij48YW5ub3RhdGlvbiBkaXNwbGF5TmFtZT0iRGlzayBmcmVlIHNwYWNlIChwZXJjZW50YWdlKSIgbG9jYWxlPSJlbi11cyIvPjwvUGVyZm9ybWFuY2VDb3VudGVyQ29uZmlndXJhdGlvbj48L1BlcmZvcm1hbmNlQ291bnRlcnM+PE1ldHJpY3MgcmVzb3VyY2VJZD0iL3N1YnNjcmlwdGlvbnMvZTNkNWE3MTUtZmQyOS00NTA5LTlkYWMtNWNhN2Y0OWZiMWEwL3Jlc291cmNlR3JvdXBzL0hDRi1MaXRlL3Byb3ZpZGVycy9NaWNyb3NvZnQuQ29tcHV0ZS92aXJ0dWFsTWFjaGluZXMvIj48TWV0cmljQWdncmVnYXRpb24gc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMUgiLz48TWV0cmljQWdncmVnYXRpb24gc2NoZWR1bGVkVHJhbnNmZXJQZXJpb2Q9IlBUMU0iLz48L01ldHJpY3M+PC9EaWFnbm9zdGljTW9uaXRvckNvbmZpZ3VyYXRpb24+PC9XYWRDZmc+",
+          "StorageAccount": "hcfdiagsac22xrivwvrv64"
+        },
+        "protectedSettings": { }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Compute/virtualMachines', parameters('virtualMachines_hcflite_vm_3_name'))]"
+      ]
+    }
+  ]
+}

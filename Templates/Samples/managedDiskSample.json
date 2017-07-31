@@ -1,0 +1,311 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "disks_manageddiskresource_name": {
+            "defaultValue": "manageddiskresource",
+            "type": "String"
+        },
+        "disks_manageddiskresource02_name": {
+            "defaultValue": "manageddiskresource02",
+            "type": "String"
+        },
+        "disks_win2016server_OsDisk_1_7ff95c446ac4430e9961a8ab087ed647_name": {
+            "defaultValue": "win2016server_OsDisk_1_7ff95c446ac4430e9961a8ab087ed647",
+            "type": "String"
+        },
+        "virtualMachines_win2016server_name": {
+            "defaultValue": "win2016server",
+            "type": "String"
+        },
+        "networkInterfaces_win2016server602_name": {
+            "defaultValue": "win2016server602",
+            "type": "String"
+        },
+        "networkSecurityGroups_win2016server_nsg_name": {
+            "defaultValue": "win2016server-nsg",
+            "type": "String"
+        },
+        "publicIPAddresses_win2016server_ip_name": {
+            "defaultValue": "win2016server-ip",
+            "type": "String"
+        },
+        "virtualNetworks_hcflite_vnet_name": {
+            "defaultValue": "hcflite-vnet",
+            "type": "String"
+        },
+        "storageAccounts_hcflitediag572_name": {
+            "defaultValue": "hcflitediag572",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/manageddiskresource'.",
+            "type": "Microsoft.Compute/disks",
+            "name": "[parameters('disks_manageddiskresource_name')]",
+            "apiVersion": "2016-04-30-preview",
+            "location": "eastus2",
+            "scale": null,
+            "properties": {
+                "accountType": "Standard_LRS",
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": 1023
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/manageddiskresource02'.",
+            "type": "Microsoft.Compute/disks",
+            "name": "[parameters('disks_manageddiskresource02_name')]",
+            "apiVersion": "2016-04-30-preview",
+            "location": "eastus2",
+            "scale": null,
+            "properties": {
+                "accountType": "Standard_LRS",
+                "creationData": {
+                    "createOption": "Empty"
+                },
+                "diskSizeGB": 1023
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/disks/win2016server_OsDisk_1_7ff95c446ac4430e9961a8ab087ed647'.",
+            "type": "Microsoft.Compute/disks",
+            "name": "[parameters('disks_win2016server_OsDisk_1_7ff95c446ac4430e9961a8ab087ed647_name')]",
+            "apiVersion": "2016-04-30-preview",
+            "location": "eastus2",
+            "scale": null,
+            "properties": {
+                "accountType": "Premium_LRS",
+                "osType": "Windows",
+                "creationData": {
+                    "createOption": "FromImage",
+                    "imageReference": {
+                        "id": "/Subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/Providers/Microsoft.Compute/Locations/eastus2/Publishers/MicrosoftWindowsServer/ArtifactTypes/VMImage/Offers/WindowsServer/Skus/2016-Datacenter/Versions/latest"
+                    }
+                },
+                "diskSizeGB": 128
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Compute/virtualMachines/win2016server'.",
+            "type": "Microsoft.Compute/virtualMachines",
+            "name": "[parameters('virtualMachines_win2016server_name')]",
+            "apiVersion": "2016-04-30-preview",
+            "location": "eastus2",
+            "scale": null,
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "Standard_DS1_v2"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "MicrosoftWindowsServer",
+                        "offer": "WindowsServer",
+                        "sku": "2016-Datacenter",
+                        "version": "latest"
+                    },
+                    "osDisk": {
+                        "osType": "Windows",
+                        "name": "[concat(parameters('virtualMachines_win2016server_name'),'_OsDisk_1_7ff95c446ac4430e9961a8ab087ed647')]",
+                        "createOption": "FromImage",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "Premium_LRS",
+                            "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_win2016server_OsDisk_1_7ff95c446ac4430e9961a8ab087ed647_name'))]"
+                        },
+                        "diskSizeGB": 128
+                    },
+                    "dataDisks": [
+                        {
+                            "lun": 0,
+                            "name": "manageddiskresource",
+                            "createOption": "Attach",
+                            "caching": "ReadWrite",
+                            "managedDisk": {
+                                "storageAccountType": "Standard_LRS",
+                                "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_manageddiskresource_name'))]"
+                            },
+                            "diskSizeGB": 1023
+                        },
+                        {
+                            "lun": 1,
+                            "name": "manageddiskresource02",
+                            "createOption": "Attach",
+                            "caching": "None",
+                            "managedDisk": {
+                                "storageAccountType": "Standard_LRS",
+                                "id": "[resourceId('Microsoft.Compute/disks', parameters('disks_manageddiskresource02_name'))]"
+                            },
+                            "diskSizeGB": 1023
+                        }
+                    ]
+                },
+                "osProfile": {
+                    "computerName": "[parameters('virtualMachines_win2016server_name')]",
+                    "adminUsername": "azureuser",
+                    "windowsConfiguration": {
+                        "provisionVMAgent": true,
+                        "enableAutomaticUpdates": true
+                    },
+                    "secrets": []
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_win2016server602_name'))]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[concat('https', '://', parameters('storageAccounts_hcflitediag572_name'), '.blob.core.windows.net', '/')]"
+                    }
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/disks', parameters('disks_win2016server_OsDisk_1_7ff95c446ac4430e9961a8ab087ed647_name'))]",
+                "[resourceId('Microsoft.Compute/disks', parameters('disks_manageddiskresource_name'))]",
+                "[resourceId('Microsoft.Compute/disks', parameters('disks_manageddiskresource02_name'))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_win2016server602_name'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccounts_hcflitediag572_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/networkInterfaces/win2016server602'.",
+            "type": "Microsoft.Network/networkInterfaces",
+            "name": "[parameters('networkInterfaces_win2016server602_name')]",
+            "apiVersion": "2017-03-01",
+            "location": "eastus2",
+            "scale": null,
+            "properties": {
+                "ipConfigurations": [
+                    {
+                        "name": "ipconfig1",
+                      "properties": {
+                        "privateIPAddress": "10.0.10.4",
+                        "privateIPAllocationMethod": "Dynamic",
+                        "publicIPAddress": {
+                          "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_win2016server_ip_name'))]"
+                        },
+                        "subnet": {
+                          "id": "[concat(resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_hcflite_vnet_name')), '/subnets/hcflite-subnet-gw')]"
+                        }
+                      }
+                    }
+                ],
+                "dnsSettings": {
+                    "dnsServers": []
+                },
+                "enableIPForwarding": false,
+                "networkSecurityGroup": {
+                    "id": "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_win2016server_nsg_name'))]"
+                }
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Network/publicIPAddresses', parameters('publicIPAddresses_win2016server_ip_name'))]",
+                "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_hcflite_vnet_name'))]",
+                "[resourceId('Microsoft.Network/networkSecurityGroups', parameters('networkSecurityGroups_win2016server_nsg_name'))]"
+            ]
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/networkSecurityGroups/win2016server-nsg'.",
+            "type": "Microsoft.Network/networkSecurityGroups",
+            "name": "[parameters('networkSecurityGroups_win2016server_nsg_name')]",
+            "apiVersion": "2017-03-01",
+            "location": "eastus2",
+            "scale": null,
+            "properties": {
+                "securityRules": [
+                    {
+                        "name": "default-allow-rdp",
+                        "properties": {
+                            "protocol": "TCP",
+                            "sourcePortRange": "*",
+                            "destinationPortRange": "3389",
+                            "sourceAddressPrefix": "*",
+                            "destinationAddressPrefix": "*",
+                            "access": "Allow",
+                            "priority": 1000,
+                            "direction": "Inbound"
+                        }
+                    }
+                ]
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/publicIPAddresses/win2016server-ip'.",
+            "type": "Microsoft.Network/publicIPAddresses",
+            "name": "[parameters('publicIPAddresses_win2016server_ip_name')]",
+            "apiVersion": "2017-03-01",
+            "location": "eastus2",
+            "scale": null,
+            "properties": {
+                "publicIPAllocationMethod": "Dynamic",
+                "idleTimeoutInMinutes": 4
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/HCF-Lite/providers/Microsoft.Network/virtualNetworks/hcflite-vnet'.",
+            "type": "Microsoft.Network/virtualNetworks",
+            "name": "[parameters('virtualNetworks_hcflite_vnet_name')]",
+            "apiVersion": "2017-03-01",
+            "location": "eastus2",
+            "scale": null,
+            "properties": {
+                "addressSpace": {
+                    "addressPrefixes": [
+                        "10.0.0.0/16"
+                    ]
+                },
+                "subnets": [
+                    {
+                        "name": "hcflite-subnet-gw",
+                        "properties": {
+                            "addressPrefix": "10.0.10.0/24"
+                        }
+                    },
+                    {
+                        "name": "hcflite-subnet-app",
+                        "properties": {
+                            "addressPrefix": "10.0.20.0/24"
+                        }
+                    },
+                    {
+                        "name": "hcflite-subnet-be",
+                        "properties": {
+                            "addressPrefix": "10.0.30.0/24"
+                        }
+                    }
+                ],
+                "virtualNetworkPeerings": []
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "Generalized from resource: '/subscriptions/e3d5a715-fd29-4509-9dac-5ca7f49fb1a0/resourceGroups/hcf-lite/providers/Microsoft.Storage/storageAccounts/hcflitediag572'.",
+            "type": "Microsoft.Storage/storageAccounts",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "Storage",
+            "name": "[parameters('storageAccounts_hcflitediag572_name')]",
+            "apiVersion": "2016-01-01",
+            "location": "eastus2",
+            "tags": {},
+            "scale": null,
+            "properties": {},
+            "dependsOn": []
+        }
+    ]
+}
