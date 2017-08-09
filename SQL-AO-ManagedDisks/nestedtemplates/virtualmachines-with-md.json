@@ -1,0 +1,150 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "_artifactsLocation": { "type": "string" },
+    "_artifactsLocationSasToken": { "type": "securestring" },
+
+    "vmName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "vmAdminUserName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "vmAdminPassword": {
+      "type": "securestring"
+    },
+    "domainName": { "type": "string" },
+
+    "vmVmSize": { "type": "string" },
+    "nrDbDataDisks": { "type": "int" },
+    "sizeDbDataDisks": { "type": "int" },
+    "cachingDbDataDisks": { "type": "string" },
+    "nrDbLogDisks": { "type": "int" },
+    "sizeDbLogDisks": { "type": "int" },
+    "cachingDbLogDisks": { "type": "string" },
+    "storageaccountName": { "type": "string" },
+    "nicName": { "type": "string" },
+    "availabilitySetName": { "type": "string" },
+    "workloadType": { "type": "string" }
+
+  },
+
+  "variables": {
+    "vmImagePublisher": "MicrosoftSQLServer",
+    "vmImageOffer": "SQL2016SP1-WS2016",
+    "imageSKU": "Enterprise",
+    "diskselectionTemplateFolder": "nestedtemplates",
+    "diskselectionTemplateFileName": "diskselection-with-md.json"
+ 
+ 
+
+
+
+  },
+  "resources": [
+    {
+      "name": "[parameters('vmName')]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "location": "[ResourceGroup().location]",
+      "apiVersion": "2016-04-30-preview",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/',parameters('vmName'),'-logdiskSelection')]"
+      ],
+      "tags": {
+        "displayName": "vm"
+      },
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('vmVmSize')]"
+        },
+        "availabilitySet": {
+          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('availabilitySetName'))]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('vmName')]",
+          "adminUsername": "[parameters('vmAdminUsername')]",
+          "adminPassword": "[parameters('vmAdminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": {
+            "publisher": "[variables('vmImagePublisher')]",
+            "offer": "[variables('vmImageOffer')]",
+            "sku": "[variables('imageSKU')]",
+            "version": "latest"
+          },
+          "osDisk": {
+            "name": "[concat(parameters('vmName'),'-osdisk')]",
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          },
+          "dataDisks": "[concat(reference(concat(parameters('vmName'),'-datadiskSelection')).outputs.dataDiskArray.value,reference(concat(parameters('vmName'),'-logdiskSelection')).outputs.dataDiskArray.value)]"
+
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('nicName')))]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "[concat(parameters('vmName'),'-datadiskSelection')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('diskselectionTemplateFolder'), '/', variables('diskselectionTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmDiskCount": { "value": "[parameters('nrDbDataDisks')]" },
+          "vmDiskSize": { "value": "[parameters('sizeDbDataDisks')]" },
+          "diskCaching": { "value": "[parameters('cachingDbDataDisks')]" },
+          "diskNamingPrefix": { "value": "[concat(parameters('vmName'),'-data')]" },
+          "storageaccountName": { "value": "[parameters('storageaccountName')]" },
+          "lunoffset": { "value": 0 }
+        }
+      }
+    },
+    {
+      "name": "[concat(parameters('vmName'),'-logdiskSelection')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/',parameters('vmName'),'-datadiskSelection')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('diskselectionTemplateFolder'), '/', variables('diskselectionTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmDiskCount": { "value": "[parameters('nrDbLogDisks')]" },
+          "vmDiskSize": { "value": "[parameters('sizeDbLogDisks')]" },
+          "diskCaching": { "value": "[parameters('cachingDbLogDisks')]" },
+          "diskNamingPrefix": { "value": "[concat(parameters('vmName'),'-log')]" },
+          "storageaccountName": { "value": "[parameters('storageaccountName')]" },
+          "lunoffset": { "value": "[parameters('nrDbDataDisks')]" }
+        }
+      }
+    }
+    
+    
+
+  ],
+
+
+
+
+
+
+  "outputs": {}
+}

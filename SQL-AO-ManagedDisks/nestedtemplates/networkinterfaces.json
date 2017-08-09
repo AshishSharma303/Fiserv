@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetResourceGroupName": { "type": "string" },
+    "vnetName": { "type": "string" },
+    "subnetName": { "type": "string" },
+    "nicName": { "type": "string" },
+    "sqlLBBEAddressPoolID": { "type": "string" }
+
+  },
+  "variables": {},
+
+  "resources": [
+    {
+      "name": "[parameters('nicName')]",
+      "type": "Microsoft.Network/networkInterfaces",
+      "location": "[ResourceGroup().location]",
+      "apiVersion": "2016-03-30",
+      "dependsOn": [],
+      "tags": {
+        "displayName": "NetworkInterface"
+      },
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "ipconfig1",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]"
+              },
+              "loadBalancerBackendAddressPools": [
+                {
+                  "id": "[parameters('sqlLBBEAddressPoolID')]"
+                }
+              ]
+            }
+
+          }
+        ]
+      }
+
+    }
+  ],
+  "outputs": {}
+}

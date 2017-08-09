@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetName": {
+      "value": "sqlnet"
+    },
+    "subnetName": {
+      "value": "default"
+    },
+
+    "nrDbDataDisks": {
+      "value": 4
+    },
+    "sizeDbDataDisks": {
+      "value": 512
+    },
+    "nrDbLogDisks": {
+      "value": 4
+    },
+    "sizeDbLogDisks": {
+      "value": 512
+    },
+    
+    "vnetResourceGroupName": {
+      "value": "sqltest"
+    },
+    "vmAdminUserName": {
+      "value": "remco"
+    },
+    "vmAdminPassword": {
+      "value": "$upeR$ecreT:123"
+    },
+    "vmVmSize": {
+      "value": "Standard_DS14_v2"
+    },
+    "sqlLBIPAddress": {
+      "value": "10.0.0.20"
+    },
+    "domainName": {
+      "value": "brosky.lan"
+    },
+
+    "dnsServerName": {
+      "value": "SQL-DC"
+    },
+    "sqlServiceAccountName": {
+      "value": "sa_sql_svc"
+    },
+    "sqlServicePassword": {
+      "value": "P@ssword!"
+    },
+    
+      "Prefix": {
+          "value": "SQL"
+      },
+    "_artifactsLocation": {
+      "value": "https://rbrdeployment.blob.core.windows.net/resources"
+    },
+      "_artifactsLocationSasToken": {
+          "value": ""
+      }
+    
+  }
+}

@@ -1,0 +1,374 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "_artifactsLocation": { "type": "string" },
+    "_artifactsLocationSasToken": { "type": "string" },
+    "vnetResourceGroupName": { "type": "string" },
+    "vnetName": { "type": "string" },
+    "subnetName": { "type": "string" },
+    "sqlLBIPAddress": { "type": "string" },
+    "vmAdminUserName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "vmAdminPassword": { "type": "securestring" },
+    "domainName": { "type": "string" },
+    "vmVmSize": { "type": "string" },
+    "nrDbDataDisks": { "type": "int" },
+    "sizeDbDataDisks": { "type": "int" },
+    "cachingDbDataDisks": {
+      "type": "string",
+      "allowedValues": [
+        "None",
+        "ReadOnly",
+        "ReadWrite"
+      ],
+      "defaultValue": "ReadOnly" /* best practice setting */
+    },
+    "nrDbLogDisks": { "type": "int" },
+    "sizeDbLogDisks": { "type": "int" },
+    "cachingDbLogDisks": {
+      "type": "string",
+      "allowedValues": [
+        "None",
+        "ReadOnly",
+        "ReadWrite"
+      ],
+      "defaultValue": "None" /* best practice setting */
+    },
+    
+    "workloadType": {
+      "type": "string",
+      "allowedValues": [
+        "GENERAL",
+        "OLTP",
+        "DW"
+      ],
+      "metadata": {
+        "description": "SQL DB workload type: GENERAL - General workload; DW - Data Warehouse workload; OLTP - Transactional Processing workload"
+      },
+      "defaultValue": "OLTP"
+    },
+    "dnsServerName": { "type": "string" },
+    "sqlServiceAccountName": { "type": "string" },
+    "sqlServicePassword": { "type": "securestring" },
+    "Prefix": {
+      "type": "string",
+      "defaultValue": "SQL"
+    }
+    
+
+
+
+
+  },
+  "variables": {
+    "prefix": "[Parameters('Prefix')]",
+    "vmName": "[concat('POC-VM-', variables('prefix'))]",
+    "storageaccountsTemplateFolder": "nestedtemplates",
+    "storageaccountsTemplateFileName": "storageaccounts.json",
+    "storageaccountName": "[toLower(concat(variables('prefix'),uniqueString(resourceGroup().id)))]",
+    "networkinterfacesTemplateFolder": "nestedtemplates",
+    "networkinterfacesTemplateFileName": "networkinterfaces.json",
+    "virtualmachinesTemplateFolder": "nestedtemplates",
+    "virtualmachinesTemplateFileName": "virtualmachines-with-md.json",
+    "virtualmachinesTemplateParametersFileName": "virtualmachines.parameters.json",
+    "availabilitySetName": "[concat('POC-AVS-',variables('prefix'))]",
+    "sqlLBName": "[concat('ILB-POC-DEL-',variables('prefix'))]",
+    "lbFE1": "[concat(variables('sqlLBName'),'-ILBFE')]",
+    "lbBE": "[concat(variables('sqlLBName'),'-ILBBE')]",
+    "sqlLBID": "[resourceId('Microsoft.Network/loadBalancers',variables('sqlLBName'))]",
+    "sqlLBFEConfigID1": "[concat(variables('sqlLBID'),'/frontendIPConfigurations/',variables('lbFE1'))]",
+    "sqlLBBEAddressPoolID": "[concat(variables('sqlLBID'),'/backendAddressPools/',variables('lbBE'))]",
+    "sqlAOProbe1": "[concat(variables('sqlLBName'),'-ILBPROBE')]",
+    "sqlLBProbeID1": "[concat(variables('sqlLBID'),'/probes/',variables('sqlAOProbe1'))]",
+    "sqlAlwaysOnEndpointName": "[concat('POC-',variables('prefix'),'-AGEP')]",
+    "sqlAlwaysOnAvailabilityGroupName1": "[concat('POC-',variables('prefix'),'-AG1')]",
+    "sqlAlwaysOnAvailabilityGroupListenerName1": "[concat('POC-', variables('prefix'),'-AGL1')]",
+    "witnessStorageType": "Standard_LRS",
+    "witnessStorageName": "[concat('witness',variables('storageaccountName'))]",
+    "sqlConfModulesURL": "[concat(parameters('_artifactsLocation'),'/DSC/conf-sqlao.ps1.zip', parameters('_artifactsLocationSasToken'))]",
+    "sqlConfFunction": "ConfSQLAO.ps1\\ConfSQLAO",
+    "sqlPrepModulesURL": "[concat(parameters('_artifactsLocation'),'/DSC/prep-sqlao.ps1.zip', parameters('_artifactsLocationSasToken'))]",
+    "sqlPrepFunction": "PrepSQLAO.ps1\\PrepSQLAO",
+    "sqluser": "[parameters('sqlServiceAccountName')]",
+    "sqlpassword": "[parameters('sqlServicePassword')]",
+    "apiVersionStorage": "2016-01-01"
+
+
+
+  },
+
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('witnessStorageName')]",
+      "apiVersion": "2016-01-01",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "[variables('witnessStorageType')]"
+      },
+      "kind": "Storage"
+    },
+    
+    {
+      "name": "[concat('networkinterfaces-',copyindex(1))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/loadBalancers', variables('sqlLBName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('networkinterfacesTemplateFolder'), '/', variables('networkinterfacesTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vnetResourceGroupName": { "value": "[parameters('vnetResourceGroupName')]" },
+          "vnetName": { "value": "[parameters('vnetName')]" },
+          "subnetName": { "value": "[parameters('subnetName')]" },
+          "nicName": { "value": "[concat(variables('vmName'),'-NIC-', padLeft(copyindex(1),3,'0'))]" },
+          "sqlLBBEAddressPoolID": { "value": "[variables('sqlLBBEAddressPoolID')]" }
+        }
+
+      },
+      "copy": {
+        "name": "NicLoop",
+        "count": 2
+      }
+    },
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('availabilitySetName')]",
+      "apiVersion": "2016-04-30-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "platformFaultDomainCount": 2,
+        "platformUpdateDomainCount": 2,
+        "managed": "true"
+      }
+    },
+    {
+      "apiVersion": "2015-06-15",
+      "name": "[variables('sqlLBName')]",
+      "type": "Microsoft.Network/loadBalancers",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [],
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "[variables('lbFE1')]",
+            "properties": {
+              "privateIPAllocationMethod": "Static",
+              "privateIPAddress": "[parameters('sqlLBIPAddress')]",
+              "subnet": {
+                "id": "[resourceId(parameters('vnetResourceGroupName'),'Microsoft.Network/virtualNetworks/subnets', parameters('vnetName'), parameters('subnetName'))]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "[variables('lbBE')]"
+          }
+        ],
+        "loadBalancingRules": [
+          {
+            "name": "[variables('sqlAlwaysOnAvailabilityGroupListenerName1')]",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[variables('sqlLBFEConfigID1')]"
+              },
+              "backendAddressPool": {
+                "id": "[variables('sqlLBBEAddressPoolID')]"
+              },
+              "probe": {
+                "id": "[variables('sqlLBProbeID1')]"
+              },
+              "protocol": "Tcp",
+              "frontendPort": 1433,
+              "backendPort": 1433,
+              "enableFloatingIP": true
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "[variables('sqlAOProbe1')]",
+            "properties": {
+              "protocol": "Tcp",
+              "port": 59999,
+              "intervalInSeconds": 5,
+              "numberOfProbes": 2
+            }
+          }
+        ]
+      }
+    },
+
+    {
+      "name": "[concat('virtualmachines-',copyindex(1))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2016-09-01",
+      "dependsOn": [
+        "NicLoop",
+        "[resourceId('Microsoft.Compute/availabilitySets', variables('availabilitySetName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('virtualmachinesTemplateFolder'), '/', variables('virtualmachinesTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "_artifactsLocation": { "value": "[parameters('_artifactsLocation')]" },
+          "_artifactsLocationSasToken": { "value": "[parameters('_artifactsLocationSasToken')]" },
+          "vmAdminUserName": { "value": "[parameters('vmAdminUserName')]" },
+          "vmAdminPassword": { "value": "[parameters('vmAdminPassword')]" },
+          "vmName": { "value": "[concat(variables('vmName'),'-',padLeft(copyIndex(1),3,'0'))]" },
+          "vmVmSize": { "value": "[parameters('vmVMSize')]" },
+          "nrDbDataDisks": { "value": "[parameters('nrDbDataDisks')]" },
+          "sizeDbDataDisks": { "value": "[parameters('sizeDbDataDisks')]" },
+          "nrDbLogDisks": { "value": "[parameters('nrDbLogDisks')]" },
+          "sizeDbLogDisks": { "value": "[parameters('sizeDbLogDisks')]" },
+          "cachingDbDataDisks": { "value": "[parameters('cachingDbDataDisks')]" },
+          "cachingDbLogDisks": { "value": "[parameters('cachingDbLogDisks')]" },
+          "storageaccountName": { "value": "[concat(variables('storageaccountName'),copyIndex(1))]" },
+          "nicName": { "value": "[concat(variables('vmName'),'-NIC-', padLeft(copyindex(1),3,'0'))]" },
+          "availabilitySetName": { "value": "[variables('availabilitySetName')]" },
+          "domainName": { "value": "[parameters('domainName')]" },
+          "workloadType": { "value": "[parameters('workloadType')]" }
+
+        }
+      },
+      "copy": {
+        "name": "VMLoop",
+        "count": 2
+      }
+    },
+
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('vmName'),'-002/PrepSQLAO')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+       "VMLoop"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.20",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "modulesUrl": "[variables('sqlPrepModulesURL')]",
+          "configurationFunction": "[variables('sqlPrepFunction')]",
+          "Properties": {
+            "domainName": "[parameters('domainName')]",
+            "adminCreds": {
+              "userName": "[parameters('vmAdminUserName')]",
+              "password": "PrivateSettingsRef:adminPassword"
+            },
+            "sqlServiceCreds": {
+              "userName": "[variables('sqluser')]",
+              "password": "PrivateSettingsRef:sqlServicePassword"
+            },
+            "numberOfDisks": "[parameters('nrDbDataDisks')]",
+            "numberOfLogDisks": "[parameters('nrDbLogDisks')]",
+            "workloadType": "[parameters('workloadType')]"
+          }
+        },
+        "protectedSettings": {
+          "items": {
+            "adminPassword": "[parameters('vmAdminPassword')]",
+            "sqlServicePassword": "[variables('sqlpassword')]"
+          }
+        }
+      }
+    },
+
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(variables('vmName'),'-001/CreateCluster')]",
+      "apiVersion": "2015-06-15",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'), '-002/extensions/PrepSQLAO') ]",
+        "[resourceId('Microsoft.Network/loadBalancers', variables('sqlLBName'))]",
+        "[resourceId('Microsoft.Storage/storageAccounts', variables('witnessStorageName'))]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Powershell",
+        "type": "DSC",
+        "typeHandlerVersion": "2.19",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "wmfVersion": "5.0",
+          "modulesUrl": "[variables('sqlConfModulesURL')]",
+          "configurationFunction": "[variables('sqlConfFunction')]",
+          "Properties": {
+            "domainName": "[parameters('domainName')]",
+            "clusterName": "[variables('vmName')]",
+            "witnessStorageName": "[variables('witnessStorageName')]",
+            "witnessStorageKey": {
+              "userName": "PLACEHOLDER-DO-NOT-USE",
+              "password": "PrivateSettingsRef:witnessStorageKey"
+            },
+            "nodes": [
+              "[concat(variables('vmName'),'-001')]",
+              "[concat(variables('vmName'),'-002')]"
+            ],
+            "sqlAlwaysOnEndpointName": "[variables('sqlAlwaysOnEndpointName')]",
+            "sqlAlwaysOnAvailabilityGroupName": "[variables('sqlAlwaysOnAvailabilityGroupName1')]",
+            "sqlAlwaysOnAvailabilityGroupListenerName": "[variables('sqlAlwaysOnAvailabilityGroupListenerName1')]",
+            "sqlAlwaysOnAvailabilityGroupListenerPort": 1433,
+            "lbName": "[variables('sqlLBName')]",
+            "lbAddress": "[parameters('sqlLBIPAddress')]",
+            "primaryReplica": "[concat(variables('vmName'),'-001')]",
+            "secondaryReplica": "[concat(variables('vmName'),'-002')]",
+            "dnsServerName": "[parameters('dnsServerName')]",
+            "adminCreds": {
+              "userName": "[parameters('vmAdminUserName')]",
+              "password": "PrivateSettingsRef:adminPassword"
+            },
+            "sqlServiceCreds": {
+              "userName": "[variables('sqluser')]",
+              "password": "PrivateSettingsRef:sqlServerServiceAccountPassword"
+            },
+            "numberOfDisks": "[parameters('nrDbDataDisks')]",
+            "numberOfLogDisks": "[parameters('nrDbLogDisks')]",
+            "workloadType": "[parameters('workloadType')]"
+           
+
+          }
+        },
+        "protectedSettings": {
+          "items": {
+            "adminPassword": "[parameters('vmAdminPassword')]",
+            "sqlServerServiceAccountPassword": "[variables('sqlpassword')]",
+            "witnessStorageKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts',variables('witnessStorageName')),variables('apiVersionStorage')).keys[0].value]"
+          }
+        }
+      }
+    }
+
+
+  ],
+
+
+
+
+
+  "outputs": {
+    "SQLServiceAccountName": {
+      "type": "string",
+      "value": "[variables('sqluser')]"
+    },
+    "SQLServicePassword": {
+      "type": "string",
+      "value": "[variables('sqlpassword')]"
+    }
+  }
+}
