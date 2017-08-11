@@ -2,6 +2,10 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/master
 
     "vmName": {
       "type": "string",
@@ -38,9 +42,6 @@
     "diskselectionTemplateFileName": "diskselection-with-md.json"
  
  
-
-
-
   },
   "resources": [
     {
@@ -90,15 +91,15 @@
         }
       }
     },
-    {
+   {
       "name": "[concat(parameters('vmName'),'-datadiskSelection')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2016-09-01",
-      "dependsOn": [],
+     "dependsOn": [],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('diskselectionTemplateFolder'), '/', variables('diskselectionTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/SQL-AO-ManagedDisks/nestedtemplates/diskselection-with-md.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -121,7 +122,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('_artifactsLocation'), '/', variables('diskselectionTemplateFolder'), '/', variables('diskselectionTemplateFileName'), parameters('_artifactsLocationSasToken'))]",
+          "uri": "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/SQL-AO-ManagedDisks/nestedtemplates/diskselection-with-md.json",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
