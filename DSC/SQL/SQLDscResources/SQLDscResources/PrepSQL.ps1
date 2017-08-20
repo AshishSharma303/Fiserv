@@ -33,9 +33,6 @@ configuration PrepSQL
     [System.Management.Automation.PSCredential]$DomainFQDNCreds = New-Object System.Management.Automation.PSCredential ("${DomainName}\$($Admincreds.UserName)", $Admincreds.Password)
     [System.Management.Automation.PSCredential]$SQLCreds = New-Object System.Management.Automation.PSCredential ("${DomainNetbiosName}\$($SQLServicecreds.UserName)", $SQLServicecreds.Password)
 
-    #[System.Management.Automation.PSCredential]$DomainCreds = New-Object System.Management.Automation.PSCredential ("${DomainNetbiosName}\$($Username)", $Password)
-    #[System.Management.Automation.PSCredential]$DomainFQDNCreds = New-Object System.Management.Automation.PSCredential ("${DomainName}\$($Username)", $Password)
-    #[System.Management.Automation.PSCredential]$SQLCreds = New-Object System.Management.Automation.PSCredential ("${DomainNetbiosName}\$($Username)", $Password)
 
 Write-Host $($DomainName)
     $RebootVirtualMachine = $false
@@ -92,7 +89,7 @@ Write-Host $($DomainName)
             LoginType = "WindowsUser"
             ServerRoles = "sysadmin"
             Enabled = $true
-            Credential = $Admincreds
+            Credential = $DomainCreds
             DependsOn = "[xComputer]DomainJoin"
    
         }
@@ -111,7 +108,7 @@ Write-Host $($DomainName)
             LoginType = "WindowsUser"
             ServerRoles = "sysadmin"
             Enabled = $true
-            Credential = $Admincreds
+            Credential = $DomainCreds
             DependsOn = "[xADUser]CreateSqlServerServiceAccount"
         }
         
@@ -172,11 +169,3 @@ function WaitForSqlSetup
         }
     }
 }#end of WaitForSQLSetup
-
-<#
-
-$cd = @{    AllNodes = @(        @{            NodeName = 'localhost'            PSDscAllowPlainTextPassword = $true        }    )}
-
-#$Admincreds = Get-Credential -UserName azureadmin -Message "Password please"#$SQLServicecreds = $Admincreds;#PrepSQL -Admincreds $Admincreds -ConfigurationData $cd
-PrepSQL -ConfigurationData $cd
-#>
