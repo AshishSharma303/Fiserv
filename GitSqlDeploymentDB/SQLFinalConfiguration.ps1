@@ -3,9 +3,9 @@
   Param(
   
   [string]$ComputerName = $env:computername,
-  [string]$UserName = "azureadmin",
-  [string]$Domain="fdwdsc",
-  [string]$SqlAdminRole = "SYSADMIN",
+  [string]$UserName,
+  [string]$Domain,
+  [string]$SqlAdminRole,
   [string]$localUser = $env:USERNAME,
   [string]$SQLQuery = "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
   
@@ -20,18 +20,17 @@
         Write-Output "gitSqlDeploymentDB Directory is present."
     }
 
-    Write-Output "Downloding Code from public repository."
+    Write-Output "Downloding Code from public repository ConfigurationFile.ini, SqlDeployment.ps1, SqlDefaultLocationChange.sql"
     function InvokeWebRequest()
     {
        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/ConfigurationFile.ini" -OutFile "C:\gitSqlDeploymentDB\ConfigurationFile.ini"
        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SqlDeployment.ps1" -OutFile "C:\gitSqlDeploymentDB\SqlDeployment.ps1"
-       #Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SqlDeployment.ps1" -OutFile "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
-
+       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SqlDefaultLocationChange.sql" -OutFile "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
        $ValidateFileCopy = Test-Path("C:\gitSqlDeploymentDB\*.ini")
        return $ValidateFileCopy
     }
     InvokeWebRequest
-    Write-Host -ForegroundColor Blue "Information stored inside the valiateFileCopy Parameter : $($ValidateFileCopy)"
+    Write-Host -ForegroundColor Cyan "Information stored inside the valiateFileCopy Parameter : $($ValidateFileCopy)"
     if($ValidateFileCopy)
     {
         $configfile = "C:\gitSqlDeploymentDB\ConfigurationFile.ini"
@@ -56,7 +55,7 @@ function AddOrSetLogin($ServerName,$UserName,$serviceAccount,$DBrole)
 	
 	Try
 	{
-        write-host "*********** Entering method AddOrSetLogin ******"
+        write-host -ForegroundColor Green "*********** Entering method AddOrSetLogin ******"
 
         Write-Host "Connecting to database ..."
         [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SMO')  | out-null
@@ -108,17 +107,17 @@ function AddOrSetLogin($ServerName,$UserName,$serviceAccount,$DBrole)
             }
             catch
             {
-                Write-Output $Error[0] $_.Exception
+                Write-host -ForegroundColor Red $Error[0] $_.Exception
                 # PSLogActivity $fileName "Failed to AddOrSetLogin for $UserName"
             }
         
 	    $cn.Close()
-        write-host "****** Exiting from method AddOrSetLogin *****"
+        write-host -ForegroundColor Green "****** Exiting from method AddOrSetLogin *****"
         # PSLogActivity $fileName "AddOrSetLogin is completed."
 	}
 	Catch [system.exception]
 	{
-		Write-Output $Error[0] $_.Exception
+		Write-host -ForegroundColor Red $Error[0] $_.Exception
 	}
 	
 }
@@ -132,8 +131,8 @@ function SQLDBDriveChange($ServerName, $SQLQuery)
 	Try
 	{
         write-host -ForegroundColor Green "*********** Entering method SQLDBDriveChange ******"
-        
         $SQLQuery= "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
+        Write-Host "Executing SQL code from local directory, C:\gitSqlDeploymentDB\"
         $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ServerName
         $Services = get-service -ComputerName $serverName
             foreach ($SQLService in $Services | where-object {$_.Name -match "MSSQLSERVER" -or $_.Name -like "MSSQL$*"})
@@ -146,7 +145,7 @@ function SQLDBDriveChange($ServerName, $SQLQuery)
 	}
 	Catch [system.exception]
 	{
-		Write-Verbose $Error[0] $_.Exception
+		Write-host -ForegroundColor Red $Error[0] $_.Exception
 	}
 	
 }
@@ -178,17 +177,18 @@ function Add-FirewallRule {
     $fw.Rules.Add($rule)
 }
 
-Write-Output *********** Entering method Add-FireWallRules *****
-#enable file and print for ping
+
+Write-host -ForegroundColor Green "*********** Script Starts... Executing Main Function *****"
+MainFunction -ComputerName "fdw-a-SQLDB-01" -UserName "azureadmin" -Domain "fdwdsc" -SqlAdminRole "SYSADMIN"
+
+Write-host -ForegroundColor Green "*********** Entering method Add-FireWallRules & enable File and print Service *****"
 netsh firewall set service type = fileandprint mode = enable 
 netsh advfirewall firewall add rule name="SQL Server Analysis Services inbound on TCP 2383" dir=in action=allow protocol=TCP localport=2383 profile=domain
 Add-FirewallRule "SQL Server" "1433" $null $null
 Add-FirewallRule "SQL SSAS" "5022" $null $null
 Add-FirewallRule "SQL Listener" "59999" $null $null
-netsh firewall set service type = fileandprint mode = enable
 
 
-MainFunction -ComputerName "fdw-a-SQLDB-01" -UserName "azureadmin" -Domain "fdwdsc" -SqlAdminRole "SYSADMIN"
 
 
 
