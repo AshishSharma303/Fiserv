@@ -194,7 +194,7 @@ function Add-FirewallRule {
     $fw.Rules.Add($rule)
 }
 
-
+Start-Transcript -Path C:\gitSqlDeploymentDB\tranScript.txt -NoClobber
 Write-host -ForegroundColor Green "*********** Script Starts... Executing Main Function *****"
 #MainFunction -ComputerName $env:computername -UserName $UserName -Domain $Domain -SqlAdminRole $SqlAdminRole
 MainFunction -ComputerName $env:computername -UserName "azureadmin" -Domain "fdwdsc" -SqlAdminRole "SYSADMIN"
@@ -208,6 +208,7 @@ Add-FirewallRule "SQL SSAS" "5022" $null $null
 Add-FirewallRule "SQL Listener" "59999" $null $null
 
 
-
+Write-host -ForegroundColor Yellow "restarting the VM.."
+Restart-Computer $env:computername -Force -Verbose
 
 
