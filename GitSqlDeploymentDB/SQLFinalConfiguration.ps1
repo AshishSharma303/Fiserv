@@ -1,4 +1,14 @@
-﻿function MainFunction()
+﻿param 
+    ( 
+        
+  [string]$ComputerName = $env:computername,
+  [string]$UserName,
+  [string]$Domain,
+  [string]$SqlAdminRole
+    ) 
+
+
+function MainFunction()
 {
   Param(
   
@@ -23,29 +33,34 @@
     Write-Output "Downloding Code from public repository ConfigurationFile.ini, SqlDeployment.ps1, SqlDefaultLocationChange.sql"
     function InvokeWebRequest()
     {
-       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/ConfigurationFile.ini" -OutFile "C:\gitSqlDeploymentDB\ConfigurationFile.ini"
-       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SqlDeployment.ps1" -OutFile "C:\gitSqlDeploymentDB\SqlDeployment.ps1"
-       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SqlDefaultLocationChange.sql" -OutFile "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
-       $ValidateFileCopy = Test-Path("C:\gitSqlDeploymentDB\*.ini")
-       return $ValidateFileCopy
+       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/ConfigurationFile.ini" -OutFile "C:\gitSqlDeploymentDB\ConfigurationFile.ini" -Verbose
+       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SqlDeployment.ps1" -OutFile "C:\gitSqlDeploymentDB\SqlDeployment.ps1" -Verbose
+       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SqlDefaultLocationChange.sql" -OutFile "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql" -Verbose
+       
     }
     InvokeWebRequest
-    Write-Host -ForegroundColor Cyan "Information stored inside the valiateFileCopy Parameter : $($ValidateFileCopy)"
-    if($ValidateFileCopy)
+    $ValidateInvokeRequest = Test-Path("C:\gitSqlDeploymentDB\*.ini")
+    Write-Host -ForegroundColor Cyan "ValidateInvokeRequest Parameter value : $($ValidateInvokeRequest)"
+    if($ValidateInvokeRequest)
     {
+        
+        Write-Host -ForegroundColor Green "Found the configuration file and executing the sql Setup.."
         $configfile = "C:\gitSqlDeploymentDB\ConfigurationFile.ini"
         $command = "C:\SQLServerFull\setup.exe /ConfigurationFile=$($configfile)"
-        Invoke-Expression -Command $command
+        Invoke-Expression -Command $command -Verbose
     }
     else
     {
         Write-Output "Configuration.ini file failed to download on local machine."
     }
+     Write-Host -ForegroundColor Green "*********** Exit from Main Function *****"
+     Write-Host ""
 
     $DomainAdmin = $Domain + "\" + $UserName
     AddOrSetLogin -ServerName $ComputerName -UserName $DomainAdmin -serviceAccount $SqlAdminRole -DBrole $SqlAdminRole
 
     SQLDBDriveChange -ServerName $ComputerName -SQLQuery $SQLQuery
+   
 
 } # main fucntion ends
 
@@ -113,6 +128,7 @@ function AddOrSetLogin($ServerName,$UserName,$serviceAccount,$DBrole)
         
 	    $cn.Close()
         write-host -ForegroundColor Green "****** Exiting from method AddOrSetLogin *****"
+        Write-Host ""
         # PSLogActivity $fileName "AddOrSetLogin is completed."
 	}
 	Catch [system.exception]
@@ -133,7 +149,7 @@ function SQLDBDriveChange($ServerName, $SQLQuery)
         write-host -ForegroundColor Green "*********** Entering method SQLDBDriveChange ******"
         $SQLQuery= "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
         Write-Host "Executing SQL code from local directory, C:\gitSqlDeploymentDB\"
-        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ServerName
+        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ServerName -Verbose
         $Services = get-service -ComputerName $serverName
             foreach ($SQLService in $Services | where-object {$_.Name -match "MSSQLSERVER" -or $_.Name -like "MSSQL$*"})
             {
@@ -141,6 +157,7 @@ function SQLDBDriveChange($ServerName, $SQLQuery)
             Restart-Service $SQLService -Verbose
             }
         write-host -ForegroundColor Green "****** Exiting from method SQLDBDriveChange *****"
+        Write-Host ""
         
 	}
 	Catch [system.exception]
@@ -179,7 +196,9 @@ function Add-FirewallRule {
 
 
 Write-host -ForegroundColor Green "*********** Script Starts... Executing Main Function *****"
-MainFunction -ComputerName "fdw-a-SQLDB-01" -UserName "azureadmin" -Domain "fdwdsc" -SqlAdminRole "SYSADMIN"
+#MainFunction -ComputerName $env:computername -UserName $UserName -Domain $Domain -SqlAdminRole $SqlAdminRole
+MainFunction -ComputerName $env:computername -UserName "azureadmin" -Domain "fdwdsc" -SqlAdminRole "SYSADMIN"
+
 
 Write-host -ForegroundColor Green "*********** Entering method Add-FireWallRules & enable File and print Service *****"
 netsh firewall set service type = fileandprint mode = enable 
