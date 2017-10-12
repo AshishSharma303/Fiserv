@@ -146,6 +146,19 @@ function SQLDBDriveChange($ServerName, $SQLQuery)
 	
 	Try
 	{
+        if (!(Test-Path "C:\MSSQL01\Data"))
+        {
+            New-Item C:\MSSQL01 -type directory -Verbose
+            New-Item C:\MSSQL01\Data -type directory -Verbose
+            New-Item C:\MSSQL01\Log -type directory -Verbose
+            New-Item C:\MSSQL01\Backups -type directory -Verbose
+            Write-Host -ForegroundColor Green " created directory for MSSQL Data, Log and backups"
+            
+        }
+        else
+        {
+            Write-Host -ForegroundColor Green "C:\MSSQL01 Directory is present."
+        }
         write-host -ForegroundColor Green "*********** Entering method SQLDBDriveChange ******"
         $SQLQuery= "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
         Write-Host "Executing SQL code from local directory, C:\gitSqlDeploymentDB\"
