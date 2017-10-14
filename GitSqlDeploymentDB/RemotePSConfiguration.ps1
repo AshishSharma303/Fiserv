@@ -22,11 +22,13 @@ function InvokeWebRequest()
 
     if (!(Test-Path "c:\gitSqlDeploymentDB"))
     {
+        Start-Transcript -Path C:\gitSqlDeploymentDB\PsRemotetranScript.txt -NoClobber -Verbose
         New-Item c:\gitSqlDeploymentDB -type directory -Verbose
         InvokeWebRequest
     }
     else
     {
+        Start-Transcript -Path C:\gitSqlDeploymentDB\PsRemotetranScript.txt -NoClobber -Verbose
         Write-Output "gitSqlDeploymentDB Directory is present."
         InvokeWebRequest
     }
@@ -37,7 +39,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     # $command = $file = $PSScriptRoot + "\SQLFinalConfiguration.ps1"
     $command = "C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"
     Enable-PSRemoting –force -Verbose
-    Invoke-Command -FilePath $command -Credential $credential -ComputerName $env:COMPUTERNAME -Verbose
+    Invoke-Command -FilePath $command -Credential $credential -ComputerName $env:COMPUTERNAME  -UserName $UserName -Domain $Domain  -SqlAdminRole $SqlAdminRole -Verbose
     # Disable-PSRemoting -Force -Verbose
 }
 else

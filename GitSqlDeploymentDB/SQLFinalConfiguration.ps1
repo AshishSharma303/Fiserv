@@ -1,11 +1,10 @@
 ﻿param 
-    ( 
-        
+ ( 
   [string]$ComputerName = $env:computername,
   [string]$UserName,
   [string]$Domain,
   [string]$SqlAdminRole
-    ) 
+ ) 
 
 
 function MainFunction()
