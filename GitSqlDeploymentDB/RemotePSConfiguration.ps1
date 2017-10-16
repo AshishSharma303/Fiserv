@@ -3,7 +3,7 @@
     [string]$ComputerName = $env:computername,
     [string]$UserName,
     [string]$Domain,
-    [string]$Password,
+    $Password,
     [string]$SqlAdminRole
     )
 
