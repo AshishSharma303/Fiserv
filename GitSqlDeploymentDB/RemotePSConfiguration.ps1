@@ -37,7 +37,8 @@ function InvokeWebRequest()
 if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 {
     $Password =  ConvertTo-SecureString $Password -AsPlainText -Force
-    $credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($UserName)", $Password)
+    $FullUserName = $ComputerName + "\" + $Username
+    $credential = New-Object System.Management.Automation.PSCredential($FullUserName, $Password)
     #$credential = New-Object System.Management.Automation.PSCredential -ArgumentList @($UserName,(ConvertTo-SecureString -String $Password -AsPlainText -Force))
     # $command = $file = $PSScriptRoot + "\SQLFinalConfiguration.ps1"
     $command = "C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"
