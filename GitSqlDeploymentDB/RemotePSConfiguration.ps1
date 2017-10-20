@@ -7,9 +7,6 @@
     [string]$SqlAdminRole
     )
 
-#$password =  ConvertTo-SecureString $Password -AsPlainText -Force
-#$credential = New-Object System.Management.Automation.PSCredential("$env:COMPUTERNAME\$($UserName)", $password)
-
 function InvokeWebRequest()
     {
        Write-host -ForegroundColor Green "Executing InvokeWebRequest Function : Downloding Code from public repository ConfigurationFile.ini, SqlDeployment.ps1, SqlDefaultLocationChange.sql, SQLFinalConfiguration.ps1"
@@ -39,11 +36,17 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     $Password =  ConvertTo-SecureString $Password -AsPlainText -Force
     $FullUserName = $ComputerName + "\" + $Username
     $credential = New-Object System.Management.Automation.PSCredential($FullUserName, $Password)
-    #$credential = New-Object System.Management.Automation.PSCredential -ArgumentList @($UserName,(ConvertTo-SecureString -String $Password -AsPlainText -Force))
-    # $command = $file = $PSScriptRoot + "\SQLFinalConfiguration.ps1"
     $command = "C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"
+    $argsList= @{
+    ComputerName = $env:computername
+    UserName = "azureadmin"
+    Domain = "fdwdsc"
+    SqlAdminRole = "sysadmin"
+    }
+
     Enable-PSRemoting –force -Verbose
-    Invoke-Command -FilePath $command -Credential $credential -ComputerName $env:COMPUTERNAME  -UserName $UserName -Domain $Domain  -SqlAdminRole $SqlAdminRole -Verbose
+    Invoke-Command -FilePath $command -Credential $credential -ComputerName $env:computername -ArgumentList $argsList -Verbose    
+    # Invoke-Command -FilePath $command -Credential $credential -ComputerName $env:COMPUTERNAME  -UserName $UserName -Domain $Domain  -SqlAdminRole $SqlAdminRole -Verbose
     # Disable-PSRemoting -Force -Verbose
 }
 else
