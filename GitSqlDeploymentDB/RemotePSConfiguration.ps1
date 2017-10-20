@@ -39,9 +39,9 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     $command = "C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"
     $argsList= @{
     ComputerName = $env:computername
-    UserName = "azureadmin"
-    Domain = "fdwdsc"
-    SqlAdminRole = "sysadmin"
+    UserName = $UserName
+    Domain = $Domain
+    SqlAdminRole = $SqlAdminRole
     }
 
     Enable-PSRemoting –force -Verbose

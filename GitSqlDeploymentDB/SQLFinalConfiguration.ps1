@@ -1,9 +1,6 @@
 ﻿param 
  ( 
-  [string]$ComputerName = $env:computername,
-  [string]$UserName,
-  [string]$Domain,
-  [string]$SqlAdminRole
+$argsList
  ) 
 
 
@@ -208,9 +205,9 @@ function Add-FirewallRule {
 
 Start-Transcript -Path C:\gitSqlDeploymentDB\tranScript.txt -NoClobber
 Write-host -ForegroundColor Green "*********** Script Starts... Executing Main Function *****"
-#MainFunction -ComputerName $env:computername -UserName $UserName -Domain $Domain -SqlAdminRole $SqlAdminRole
-MainFunction -ComputerName $env:computername -UserName "azureadmin" -Domain "fdwdsc" -SqlAdminRole "SYSADMIN"
 
+MainFunction -ComputerName $env:computername -UserName $argsList.UserName -Domain $argsList.Domain -SqlAdminRole $argsList.SqlAdminRole
+# MainFunction -ComputerName $env:computername -UserName "azureadmin" -Domain "fdwdsc" -SqlAdminRole "SYSADMIN"
 
 Write-host -ForegroundColor Green "*********** Entering method Add-FireWallRules & enable File and print Service *****"
 netsh firewall set service type = fileandprint mode = enable 
