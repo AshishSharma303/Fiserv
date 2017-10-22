@@ -42,7 +42,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     Enable-PSRemoting –force -Verbose
 
     Invoke-Command -ComputerName $env:computername  -Credential $credential -ScriptBlock {
-    Param($ComputerName, $UserName,$Domain,$SqlAdminRole)
+    Param($ComputerName,$UserName,$Domain,$SqlAdminRole)
     Try
 	{
         $DomainUser = $Domain + "\" + $UserName
@@ -95,7 +95,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 	{
 		Write-host -ForegroundColor Red $Error[0] $_.Exception
 	}
-    } -ArgumentList $ComputerName $UserName $Domain $SqlAdminRole
+    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole
 }
 else
 {
