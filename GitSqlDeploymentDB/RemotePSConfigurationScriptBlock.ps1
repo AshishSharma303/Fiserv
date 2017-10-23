@@ -95,6 +95,46 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 	{
 		Write-host -ForegroundColor Red $Error[0] $_.Exception
 	}
+    
+    ######## SQL Drive Change Code #########
+    	Try
+	{
+        if (!(Test-Path "C:\MSSQL01\Data"))
+        {
+            New-Item C:\MSSQL01 -type directory -Verbose
+            New-Item C:\MSSQL01\Data -type directory -Verbose
+            New-Item C:\MSSQL01\Log -type directory -Verbose
+            New-Item C:\MSSQL01\Backups -type directory -Verbose
+            Write-Host -ForegroundColor Green " created directory for MSSQL Data, Log and backups"
+        }
+        else
+        {
+            Write-Host -ForegroundColor Green "C:\MSSQL01 Directory is present."
+        }
+        write-host -ForegroundColor Green "*********** Entering method SQLDBDriveChange ******"
+        $SQLQuery= "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
+        Write-Host "Executing SQL code from local directory, C:\gitSqlDeploymentDB\"
+        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ComputerName -Verbose
+        $Services = get-service -ComputerName $serverName
+            foreach ($SQLService in $Services | where-object {$_.Name -match "MSSQLSERVER" -or $_.Name -like "MSSQL$*"})
+            {
+            Write-Host -ForegroundColor Cyan "Restarting SQL Service.."
+            Restart-Service $SQLService -Verbose
+            }
+        write-host -ForegroundColor Green "****** Exiting from method SQLDBDriveChange *****"
+        Write-Host ""
+        
+	}
+	Catch [system.exception]
+	{
+		Write-host -ForegroundColor Red $Error[0] $_.Exception
+	}
+
+    ######## SQL Drive Change Code Ends #########
+
+
+
+
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole
 }
 else
