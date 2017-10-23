@@ -96,6 +96,23 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 		Write-host -ForegroundColor Red $Error[0] $_.Exception
 	}
     
+    ######## SQL update Code though ini #########
+    if(Test-Path("C:\gitSqlDeploymentDB\*.ini"))
+    {
+       Write-Host -ForegroundColor Green "Found the configuration file and executing the sql Setup.."
+        $configfile = "C:\gitSqlDeploymentDB\ConfigurationFile.ini"
+        $command = "C:\SQLServerFull\setup.exe /ConfigurationFile=$($configfile)"
+        Invoke-Expression -Command $command -Verbose
+    }
+    else
+    {
+        Write-Output "Configuration.ini file failed to download on local machine."
+    }
+    ######## SQL update Code though ini END #########
+
+
+
+
     ######## SQL Drive Change Code #########
     	Try
 	{
