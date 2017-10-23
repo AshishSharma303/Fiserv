@@ -115,7 +115,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
         $SQLQuery= "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
         Write-Host "Executing SQL code from local directory, C:\gitSqlDeploymentDB\"
         $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ComputerName -Verbose
-        $Services = get-service -ComputerName $serverName
+        $Services = get-service -ComputerName $ComputerName
             foreach ($SQLService in $Services | where-object {$_.Name -match "MSSQLSERVER" -or $_.Name -like "MSSQL$*"})
             {
             Write-Host -ForegroundColor Cyan "Restarting SQL Service.."
