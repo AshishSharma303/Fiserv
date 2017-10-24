@@ -42,7 +42,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     Enable-PSRemoting –force -Verbose
 
     Invoke-Command -ComputerName $env:computername  -Credential $credential -ScriptBlock {
-    Param($ComputerName,$UserName,$Domain,$SqlAdminRole)
+    Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
     Try
 	{
         $DomainUser = $Domain + "\" + $UserName
@@ -112,7 +112,6 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 
 
 
-
     ######## SQL Drive Change Code #########
     	Try
 	{
@@ -131,7 +130,8 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
         write-host -ForegroundColor Green "*********** Entering method SQLDBDriveChange ******"
         $SQLQuery= "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
         Write-Host "Executing SQL code from local directory, C:\gitSqlDeploymentDB\"
-        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ComputerName -Verbose
+        $localUserName = $ComputerName + "\" + $UserName
+        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ComputerName -Username $localUserName -Password $Password -Verbose
         $Services = get-service -ComputerName $ComputerName
             foreach ($SQLService in $Services | where-object {$_.Name -match "MSSQLSERVER" -or $_.Name -like "MSSQL$*"})
             {
@@ -152,7 +152,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 
 
 
-    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole
+    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password
 }
 else
 {
