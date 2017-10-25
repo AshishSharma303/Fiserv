@@ -107,7 +107,9 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 
 
 ######## SQL Drive Change Code #########
-    	Try
+    $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
+    Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
+        Try
 	{
         if (!(Test-Path "C:\MSSQL01\Data"))
         {
@@ -126,7 +128,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
         Write-Host "Executing SQL code from local directory, C:\gitSqlDeploymentDB\"
         $localUserName = $ComputerName + "\" + $UserName
         $Password =  ConvertTo-SecureString $Password -AsPlainText -Force
-        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ComputerName -Username $UserName -Password $Password -Verbose
+        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ComputerName -Username $localUserName -Password $Password -Verbose
         $Services = get-service -ComputerName $ComputerName
             foreach ($SQLService in $Services | where-object {$_.Name -match "MSSQLSERVER" -or $_.Name -like "MSSQL$*"})
             {
@@ -141,6 +143,10 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 	{
 		Write-host -ForegroundColor Red $Error[0] $_.Exception
 	}
+    
+    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
+    
+
 
     ######## SQL Drive Change Code Ends #########
 
