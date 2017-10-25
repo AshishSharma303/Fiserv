@@ -41,6 +41,9 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     $command = "C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"
     Enable-PSRemoting –force -Verbose
 
+########################################
+######## SQL update Code setup Login#########
+########################################
     Invoke-Command -ComputerName $env:computername  -Credential $credential -ScriptBlock {
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
     Try
@@ -98,6 +101,10 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 
 
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password
+########################################
+######## SQL update Code setup Login#########
+########################################
+
 }
 else
 {
