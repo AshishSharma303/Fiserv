@@ -46,6 +46,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 ########################################
 ######## Firewall and baisc rules setups#########
 ########################################
+    $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
     function Add-FirewallRule {
@@ -75,7 +76,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     Add-FirewallRule "SQL Server" "1433" $null $null
     Add-FirewallRule "SQL SSAS" "5022" $null $null
     Add-FirewallRule "SQL Listener" "59999" $null $null
-    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password
+    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
 ########################################
 ######## Firewall and baisc rules setups Ends #####
 ########################################
@@ -193,7 +194,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
 ########################################
-######## SQL Drive Change Code Ends #####
+######## SQL Drive Change Code Ends #########
 ########################################
 
 
@@ -224,7 +225,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
 ########################################
-######## SQL Drive Change Code Ends #####
+######## SQL Drive Change Code Ends #########
 ########################################
 
 }
