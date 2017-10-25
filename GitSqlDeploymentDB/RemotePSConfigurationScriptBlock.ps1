@@ -44,7 +44,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 ########################################
 ######## SQL update Code setup Login#########
 ########################################
-    Invoke-Command -ComputerName $env:computername  -Credential $credential -ScriptBlock {
+    Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
     Try
 	{
