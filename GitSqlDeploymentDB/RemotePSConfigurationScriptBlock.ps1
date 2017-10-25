@@ -41,6 +41,8 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     $command = "C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"
     Enable-PSRemoting –force -Verbose
 
+
+
 ########################################
 ######## SQL update Code setup Login#########
 ########################################
@@ -102,11 +104,14 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password
 ########################################
-######## SQL update Code setup Login#########
+######## SQL update Code setup Login Ends #####
 ########################################
 
 
-######## SQL Drive Change Code #########
+
+########################################
+######## SQL Drive Change Code #############
+########################################
     $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
@@ -147,12 +152,40 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 	}
     
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
+########################################
+######## SQL Drive Change Code Ends #####
+########################################
+
+
+
+
+########################################
+######## SQL Drive Change Code #############
+########################################
+    $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
+    Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
+    Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
+    $ValidateInvokeRequest = Test-Path("C:\gitSqlDeploymentDB\*.ini")
+    Write-Host -ForegroundColor Cyan "ValidateInvokeRequest Parameter value : $($ValidateInvokeRequest)"
+    if($ValidateInvokeRequest)
+    {
+        Write-Host -ForegroundColor Green "Found the configuration file and executing the sql Setup.."
+        $configfile = "C:\gitSqlDeploymentDB\ConfigurationFile.ini"
+        $command = "C:\SQLServerFull\setup.exe /ConfigurationFile=$($configfile)"
+        Invoke-Expression -Command $command -Verbose
+        Write-host -ForegroundColor Yellow "configuration done though INI file and its the time to restart the VM...."
+        Restart-Computer $env:computername -Force -Verbose
+    }
+    else
+    {
+        Write-Output "Configuration.ini file failed to download on local machine."
+    }
+
     
-
-
-    ######## SQL Drive Change Code Ends #########
-
-
+    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
+########################################
+######## SQL Drive Change Code Ends #####
+########################################
 
 }
 else
