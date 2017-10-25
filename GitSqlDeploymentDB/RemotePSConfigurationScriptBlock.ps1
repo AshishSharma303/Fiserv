@@ -55,7 +55,6 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 	    $cn.Open()
 	    $cmd = new-object System.Data.SqlClient.SqlCommand
 	    $cmd.Connection = $cn
-     
             try
             {
                 $ServiceAccount = "SYSADMIN"
@@ -96,60 +95,6 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 		Write-host -ForegroundColor Red $Error[0] $_.Exception
 	}
     
-    ######## SQL update Code though ini #########
-    if(Test-Path("C:\gitSqlDeploymentDB\*.ini"))
-    {
-       Write-Host -ForegroundColor Green "Found the configuration file and executing the sql Setup.."
-        $configfile = "C:\gitSqlDeploymentDB\ConfigurationFile.ini"
-        $command = "C:\SQLServerFull\setup.exe /ConfigurationFile=$($configfile)"
-        Invoke-Expression -Command $command -Verbose
-    }
-    else
-    {
-        Write-Output "Configuration.ini file failed to download on local machine."
-    }
-    ######## SQL update Code though ini END #########
-
-
-
-    ######## SQL Drive Change Code #########
-    	Try
-	{
-        if (!(Test-Path "C:\MSSQL01\Data"))
-        {
-            New-Item C:\MSSQL01 -type directory -Verbose
-            New-Item C:\MSSQL01\Data -type directory -Verbose
-            New-Item C:\MSSQL01\Log -type directory -Verbose
-            New-Item C:\MSSQL01\Backups -type directory -Verbose
-            Write-Host -ForegroundColor Green " created directory for MSSQL Data, Log and backups"
-        }
-        else
-        {
-            Write-Host -ForegroundColor Green "C:\MSSQL01 Directory is present."
-        }
-        write-host -ForegroundColor Green "*********** Entering method SQLDBDriveChange ******"
-        $SQLQuery= "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
-        Write-Host "Executing SQL code from local directory, C:\gitSqlDeploymentDB\"
-        $localUserName = $ComputerName + "\" + $UserName
-        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ComputerName -Username $localUserName -Password $Password -Verbose
-        $Services = get-service -ComputerName $ComputerName
-            foreach ($SQLService in $Services | where-object {$_.Name -match "MSSQLSERVER" -or $_.Name -like "MSSQL$*"})
-            {
-            Write-Host -ForegroundColor Cyan "Restarting SQL Service.."
-            Restart-Service $SQLService -Verbose
-            }
-        write-host -ForegroundColor Green "****** Exiting from method SQLDBDriveChange *****"
-        Write-Host ""
-        
-	}
-	Catch [system.exception]
-	{
-		Write-host -ForegroundColor Red $Error[0] $_.Exception
-	}
-
-    ######## SQL Drive Change Code Ends #########
-
-
 
 
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password
