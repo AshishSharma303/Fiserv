@@ -109,6 +109,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 ######## SQL Drive Change Code #########
     $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
+    Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
         Try
 	{
         if (!(Test-Path "C:\MSSQL01\Data"))
