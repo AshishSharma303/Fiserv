@@ -44,6 +44,46 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 
 
 ########################################
+######## Firewall and baisc rules setups#########
+########################################
+    Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
+    Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
+    function Add-FirewallRule {
+       param( 
+          $name,
+          $tcpPorts,
+          $appName = $null,
+          $serviceName = $null
+       )
+        $fw = New-Object -ComObject hnetcfg.fwpolicy2 
+        $rule = New-Object -ComObject HNetCfg.FWRule
+        $rule.Name = $name
+        if ($appName -ne $null) { $rule.ApplicationName = $appName }
+        if ($serviceName -ne $null) { $rule.serviceName = $serviceName }
+        $rule.Protocol = 6 #NET_FW_IP_PROTOCOL_TCP
+        $rule.LocalPorts = $tcpPorts
+        $rule.Enabled = $true
+        $rule.Grouping = "@firewallapi.dll,-23255"
+        $rule.Profiles = 7 # all
+        $rule.Action = 1 # NET_FW_ACTION_ALLOW
+        $rule.EdgeTraversal = $false
+        $fw.Rules.Add($rule)
+    }
+    Write-host -ForegroundColor Green "*********** Entering method Add-FireWallRules & enable File and print Service *****"
+    netsh firewall set service type = fileandprint mode = enable
+    netsh advfirewall firewall add rule name="SQL Server Analysis Services inbound on TCP 2383" dir=in action=allow protocol=TCP localport=2383 profile=domain
+    Add-FirewallRule "SQL Server" "1433" $null $null
+    Add-FirewallRule "SQL SSAS" "5022" $null $null
+    Add-FirewallRule "SQL Listener" "59999" $null $null
+    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password
+########################################
+######## Firewall and baisc rules setups Ends #####
+########################################
+
+
+
+
+########################################
 ######## SQL update Code setup Login#########
 ########################################
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
