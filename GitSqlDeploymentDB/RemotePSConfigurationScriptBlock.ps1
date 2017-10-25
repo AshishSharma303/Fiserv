@@ -125,7 +125,8 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
         $SQLQuery= "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
         Write-Host "Executing SQL code from local directory, C:\gitSqlDeploymentDB\"
         $localUserName = $ComputerName + "\" + $UserName
-        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ComputerName -Verbose
+        $Password =  ConvertTo-SecureString $Password -AsPlainText -Force
+        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ComputerName -Username $UserName -Password $Password -Verbose
         $Services = get-service -ComputerName $ComputerName
             foreach ($SQLService in $Services | where-object {$_.Name -match "MSSQLSERVER" -or $_.Name -like "MSSQL$*"})
             {
