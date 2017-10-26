@@ -43,12 +43,74 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 
 
 
+
+########################################
+########## Disk related configurations##########
+########################################
+    $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
+    Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
+    Param($ComputerName,$UserName)
+    Function Get_Poolable_Disk
+    {
+        $PhysicalDisks = Get-StorageSubSystem | Get-PhysicalDisk -CanPool $True -Verbose
+        Return $PhysicalDisks
+    }
+
+    Function Get_Total_Size_For_Pool
+    {
+        $TotalSize = ((Get-PhysicalDisk -CanPool $True).Size) -join '+' | Invoke-Expression -Verbose
+        Return $TotalSize
+    }
+
+    Function Get_Total_Number_of_Disk
+    {
+		$PoolNumber = 0
+        $a=Get-PhysicalDisk | where { $_.CanPool -eq $true } -Verbose
+		if ( $a )
+		{
+			$PoolNumber = $a.Count 
+		}
+		Return $poolNumber
+    }
+
+    $PhysicalDisks = Get_Poolable_Disk
+    if ($PhysicalDisks)
+    {
+        Get-Disk | where partitionstyle -EQ "raw" | Initialize-Disk -PartitionStyle MBR -PassThru |  New-Partition -AssignDriveLetter -UseMaximumSize | Format-Volume -FileSystem NTFS -NewFileSystemLabel "disk2" -Confirm:$false
+    }
+
+    } -ArgumentList $ComputerName, $UserName -SessionOption $pso  -Verbose
+########################################
+########## Disk related configurations Ends #####
+########################################
+
+
+
+
+
 ########################################
 ######## Firewall and baisc rules setup#########
 ########################################
     $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
+    function Disable-InternetExplorerESC {
+    $AdminKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A7-37EF-4b3f-8CFC-4F3A74704073}"
+    $UserKey = "HKLM:\SOFTWARE\Microsoft\Active Setup\Installed Components\{A509B1A8-37EF-4b3f-8CFC-4F3A74704073}"
+    Set-ItemProperty -Path $AdminKey -Name "IsInstalled" -Value 0
+    Set-ItemProperty -Path $UserKey -Name "IsInstalled" -Value 0
+	
+	<#
+	if ( Get-Process -Name Explorer )
+	{
+	    Stop-Process -Name Explorer
+	}
+	Write-Host "IE Enhanced Security Configuration (ESC) has been disabled." -ForegroundColor Green
+	#>
+    echo "IE Enhanced Security Configuration (ESC) has been disabled."
+} # End Disable-IE setting
+    Write-host -ForegroundColor Green "*********** Disable Internet explorer settings*****"
+    Disable-InternetExplorerESC
     function Add-FirewallRule {
        param( 
           $name,
@@ -69,7 +131,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
         $rule.Action = 1 # NET_FW_ACTION_ALLOW
         $rule.EdgeTraversal = $false
         $fw.Rules.Add($rule)
-    }
+    } # End of add-FirewallRule
     Write-host -ForegroundColor Green "*********** Entering method Add-FireWallRules & enable File and print Service *****"
     netsh firewall set service type = fileandprint mode = enable
     netsh advfirewall firewall add rule name="SQL Server Analysis Services inbound on TCP 2383" dir=in action=allow protocol=TCP localport=2383 profile=domain
@@ -158,17 +220,17 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
         Try
 	{
-        if (!(Test-Path "C:\MSSQL01\Data"))
+        if (!(Test-Path "F:\MSSQL01\Data"))
         {
-            New-Item C:\MSSQL01 -type directory -Verbose
-            New-Item C:\MSSQL01\Data -type directory -Verbose
-            New-Item C:\MSSQL01\Log -type directory -Verbose
-            New-Item C:\MSSQL01\Backups -type directory -Verbose
+            New-Item F:\MSSQL01 -type directory -Verbose
+            New-Item F:\MSSQL01\Data -type directory -Verbose
+            New-Item F:\MSSQL01\Log -type directory -Verbose
+            New-Item F:\MSSQL01\Backups -type directory -Verbose
             Write-Host -ForegroundColor Green " created directory for MSSQL Data, Log and backups"
         }
         else
         {
-            Write-Host -ForegroundColor Green "C:\MSSQL01 Directory is present."
+            Write-Host -ForegroundColor Green "F:\MSSQL01 Directory is present."
         }
         write-host -ForegroundColor Green "*********** Entering method SQLDBDriveChange ******"
         $SQLQuery= "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
