@@ -9,29 +9,26 @@
 
 function InvokeWebRequest()
     {
-       Write-host -ForegroundColor Green "Executing InvokeWebRequest Function : Downloding Code from public repository ConfigurationFile.ini, SqlDeployment.ps1, SqlDefaultLocationChange.sql, SQLFinalConfiguration.ps1"
-       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/ConfigurationFile.ini" -OutFile "C:\gitSqlDeploymentDB\ConfigurationFile.ini" -Verbose
-       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SqlDeployment.ps1" -OutFile "C:\gitSqlDeploymentDB\SqlDeployment.ps1" -Verbose
-       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SqlDefaultLocationChange.sql" -OutFile "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql" -Verbose
-       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SQLFinalConfiguration.ps1" -OutFile "C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1" -Verbose
-       Invoke-WebRequest -Uri "https://github.com/AshishSharma303/Fiserv/blob/master/GitSqlDeploymentDB/RemotePSConfigurationScriptBlock.ps1" -OutFile "C:\gitSqlDeploymentDB\RemotePSConfigurationScriptBlock.ps1" -Verbose
+       Write-host -ForegroundColor Green "Executing InvokeWebRequest Function : Downloding Code from public repository ConfigurationFileASIS.ini, SqlDeployment.ps1, SqlDefaultLocationChange.sql, SQLFinalConfiguration.ps1"
+       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/ConfigurationFileASIS.ini" -OutFile "C:\gitSqlDeploymentASIS\ConfigurationFileASIS.ini" -Verbose
+       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SQLFinalConfiguration.ps1" -OutFile "C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1" -Verbose
     } # end of InvokeFunction
 
 
-    if (!(Test-Path "c:\gitSqlDeploymentDB"))
+    if (!(Test-Path "c:\gitSqlDeploymentASIS\PsRemoteTranScript.txt"))
     {
-        Start-Transcript -Path C:\gitSqlDeploymentDB\PsRemotetranScript.txt -NoClobber -Verbose
-        New-Item c:\gitSqlDeploymentDB -type directory -Verbose
+        Start-Transcript -Path C:\gitSqlDeploymentASIS\PsRemoteTranScript.txt -NoClobber -Verbose
+        New-Item c:\gitSqlDeploymentASIS -type directory -Verbose
         InvokeWebRequest
     }
     else
     {
-        Start-Transcript -Path C:\gitSqlDeploymentDB\PsRemotetranScript.txt -NoClobber -Verbose
+        Start-Transcript -Path C:\gitSqlDeploymentASIS\PsRemoteTranScript.txt -NoClobber -Verbose
         Write-Output "gitSqlDeploymentDB Directory is present."
         InvokeWebRequest
     }
 
-if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
+if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
 {
     $UserName = $UserName.ToUpper()
     $SqlAdminRole = $SqlAdminRole.ToUpper()
@@ -148,7 +145,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 
 
 ########################################
-######## SQL update Code setup Login#########
+######## SQL Setup for SYSADMIN Login#########
 ########################################
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
@@ -204,59 +201,31 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
 		Write-host -ForegroundColor Red $Error[0] $_.Exception
 	}
     
-
-
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password
 ########################################
-######## SQL update Code setup Login Ends #####
+########SQL Setup for SYSADMIN Login ########
 ########################################
 
 
 
+
 ########################################
-######## SQL Drive Change Code #############
+########## SQL AS TAB mode change #########
 ########################################
     $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
-    Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
-        Try
-	{
-        if (!(Test-Path "F:\MSSQL01\Data"))
-        {
-            New-Item F:\MSSQL01 -type directory -Verbose
-            New-Item F:\MSSQL01\Data -type directory -Verbose
-            New-Item F:\MSSQL01\Log -type directory -Verbose
-            New-Item F:\MSSQL01\Backups -type directory -Verbose
-            Write-Host -ForegroundColor Green " Created directory for MSSQL Data, Log and backups"
-        }
-        else
-        {
-            Write-Host -ForegroundColor Green "F:\MSSQL01 Directory is already present."
-        }
-        write-host -ForegroundColor Green "*********** Entering method SQLDBDriveChange ******"
-        $SQLQuery= "C:\gitSqlDeploymentDB\SqlDefaultLocationChange.sql"
-        Write-Host "Executing SQL code from local directory, C:\gitSqlDeploymentDB\\SqlDefaultLocationChange.sql"
-        $localUserName = $ComputerName + "\" + $UserName
-        $result = invoke-sqlcmd -InputFile $SQLQuery -serverinstance $ComputerName -Verbose
-        $Services = get-service -ComputerName $ComputerName
-            foreach ($SQLService in $Services | where-object {$_.Name -match "MSSQLSERVER" -or $_.Name -like "MSSQL$*"})
-            {
-            Write-Host -ForegroundColor Cyan "Restarting SQL Service.."
-            Restart-Service $SQLService -Verbose
-            }
-        write-host -ForegroundColor Green "****** Exiting from method SQLDBDriveChange *****"
-        Write-Host ""
-        
-	}
-	Catch [system.exception]
-	{
-		Write-host -ForegroundColor Red $Error[0] $_.Exception
-	}
-    
-    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
+    Param($ComputerName,$Password)
+    Add-type -AssemblyName "Microsoft.AnalysisServices, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
+    $s=New-Object Microsoft.AnalysisServices.server
+	$s.Connect($computerName)
+	$info = "Current Server Mode: " + $s.ServerMode
+	$s.ServerMode="Tabular"
+	$s.Update()
+    } -ArgumentList $ComputerName, $Password -SessionOption $pso  -Verbose
 ########################################
-######## SQL Drive Change Code Ends #########
+####### SQL AS TAB mode change END  ########
 ########################################
+
 
 
 
@@ -272,7 +241,7 @@ if (Test-Path("C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"))
     if($ValidateInvokeRequest)
     {
         Write-Host -ForegroundColor Green "Found the configuration file and executing the sql Setup.."
-        $configfile = "C:\gitSqlDeploymentDB\ConfigurationFile.ini"
+        $configfile = "C:\gitSqlDeploymentDB\ConfigurationFileASIS.ini"
         $command = "C:\SQLServerFull\setup.exe /ConfigurationFile=$($configfile)"
         Invoke-Expression -Command $command -Verbose
         Write-host -ForegroundColor Yellow "configuration done though INI file and its the time to restart the VM...."
