@@ -263,6 +263,7 @@ $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -Ou
         $command = "C:\SQLServerFull\setup.exe /ConfigurationFile=$($configfile)"
         Invoke-Expression -Command $command -Verbose
         Write-host -ForegroundColor Yellow "configuration done though INI file and its the time to restart the VM...."
+        Stop-Transcript -Verbose
         Restart-Computer $env:computername -Force -Verbose
     }
     else
@@ -279,4 +280,5 @@ $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -Ou
 else
 {
     Write-Host " PS remote Script did not work, as could not found the C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1 at its location"
+    Stop-Transcript -Verbose
 }
