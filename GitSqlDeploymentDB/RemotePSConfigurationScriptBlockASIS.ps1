@@ -9,7 +9,7 @@
 
 function InvokeWebRequest()
     {
-       Write-host -ForegroundColor Green "Executing InvokeWebRequest Function : Downloding Code from public repository ConfigurationFileASIS.ini, SqlDeployment.ps1, SqlDefaultLocationChange.sql, SQLFinalConfiguration.ps1"
+       Write-host -ForegroundColor Green "Executing InvokeWebRequest Function : Downloding Code from public repository ConfigurationFileASIS.ini, SqlDeployment.ps1, RemotePSConfigurationScriptBlockASIS.ps1"
        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/ConfigurationFileASIS.ini" -OutFile "C:\gitSqlDeploymentASIS\ConfigurationFileASIS.ini" -Verbose
        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SQLFinalConfiguration.ps1" -OutFile "C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1" -Verbose
        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/RemotePSConfigurationScriptBlockASIS.ps1" -OutFile "C:\gitSqlDeploymentASIS\RemotePSConfigurationScriptBlockASIS.ps1" -Verbose
@@ -25,7 +25,7 @@ function InvokeWebRequest()
     else
     {
         Start-Transcript -Path C:\gitSqlDeploymentASIS\PsRemoteTranScript.txt -NoClobber -Verbose
-        Write-Output "gitSqlDeploymentDB Directory is present."
+        Write-Output "gitSqlDeploymentASIS Directory is present."
         InvokeWebRequest
     }
 
@@ -36,7 +36,7 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
     $Password =  ConvertTo-SecureString $Password -AsPlainText -Force
     $FullUserName = $ComputerName + "\" + $Username
     $credential = New-Object System.Management.Automation.PSCredential($FullUserName, $Password)
-    $command = "C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1"
+    $command = "C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"
     Enable-PSRemoting –force -Verbose
 
 
@@ -145,9 +145,11 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
 
 
 
+
 ########################################
 ######## SQL Setup for SYSADMIN Login#########
 ########################################
+$pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
     Try
@@ -202,7 +204,7 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
 		Write-host -ForegroundColor Red $Error[0] $_.Exception
 	}
     
-    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password
+    } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
 ########################################
 ########SQL Setup for SYSADMIN Login ########
 ########################################
@@ -210,19 +212,34 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
 
 
 
+
 ########################################
 ########## SQL AS TAB mode change #########
 ########################################
-    $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
+    $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop -Verbose
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$Password)
-    Add-type -AssemblyName "Microsoft.AnalysisServices, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
-    $s=New-Object Microsoft.AnalysisServices.server
-	$s.Connect($computerName)
-	$info = "Current Server Mode: " + $s.ServerMode
-	$s.ServerMode="Tabular"
-	$s.Update()
-    } -ArgumentList $ComputerName, $Password -SessionOption $pso  -Verbose
+    <#
+    # load the AMO assembly in Powershell 
+    [System.Reflection.Assembly]::LoadWithPartialName("Microsoft.AnalysisServices")
+    # And then create a server object :
+    $serverAS = New-Object Microsoft.AnalysisServices.Server
+    # And connect to your Analysis Services server :
+    $serverAS.connect($ComputerName)
+    # Now, you can easily query your Analysis Services to know how it is configured :
+    $serverAS.serverproperties | select Name, Value
+    Write-Host -ForegroundColor Green "Current Server Mode: " + $serverAS.ServerMode
+    Write-Host "Updating the Mode of AD server to Tabular"
+    $serverAS.ServerMode="Tabular"
+	$serverAS.Update()
+    Write-Host "Updating server configuration changes"
+    #>
+
+    $path = "C:\Program Files\Microsoft SQL Server\MSAS13.MSSQLSERVER\OLAP\Config\msmdsrv.ini" 
+    (Get-Content $path) -replace "<DeploymentMode>0</DeploymentMode>","<DeploymentMode>2</DeploymentMode>" | out-file $path -Verbose
+    Restart-Service -Name MSSQLServerOLAPService -Verbose
+
+    } -ArgumentList $ComputerName, $Password -SessionOption $pso -Verbose
 ########################################
 ####### SQL AS TAB mode change END  ########
 ########################################
@@ -234,7 +251,7 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
 ########################################
 ### SQL features amendmends though INI Code ###
 ########################################
-    $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
+    $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop -Verbose
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
     $ValidateInvokeRequest = Test-Path("C:\gitSqlDeploymentASIS\*.ini")
@@ -242,7 +259,7 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
     if($ValidateInvokeRequest)
     {
         Write-Host -ForegroundColor Green "Found the configuration file and executing the sql Setup.."
-        $configfile = "C:\gitSqlDeploymentDB\ConfigurationFileASIS.ini"
+        $configfile = "C:\gitSqlDeploymentASIS\ConfigurationFileASIS.ini"
         $command = "C:\SQLServerFull\setup.exe /ConfigurationFile=$($configfile)"
         Invoke-Expression -Command $command -Verbose
         Write-host -ForegroundColor Yellow "configuration done though INI file and its the time to restart the VM...."
@@ -254,12 +271,12 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
     }
 
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
-########################################
-### SQL features amendmends though INI Code ###
-########################################
+#####################################################
+### SQL features amendmends though INI Code END's ###
+#####################################################
 
 }
 else
 {
-    Write-Host " PS remote Script did not work, as could not found the C:\gitSqlDeploymentDB\SQLFinalConfiguration.ps1 at its location"
+    Write-Host " PS remote Script did not work, as could not found the C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1 at its location"
 }
