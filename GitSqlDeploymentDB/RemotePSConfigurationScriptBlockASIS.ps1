@@ -147,62 +147,30 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
 
 
 ########################################
-######## SQL Setup for SYSADMIN Login#########
+######## SQL Setup for SYSADMIN Login########
 ########################################
 $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
-    Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
+Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
-    Try
-	{
-        $DomainUser = $Domain + "\" + $UserName
-        write-host -ForegroundColor Green "*********** Entering method AddOrSetLogin ******"
-        Write-Host "Connecting to database ..."
-        [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SMO')  | out-null
-	    $cnstr = "Server="+$ServerName+";Database=master;Integrated Security=True;"
-        $cn = New-Object System.Data.SqlClient.SqlConnection
-	    $cn.ConnectionString = $cnstr
-	    $cn.Open()
-	    $cmd = new-object System.Data.SqlClient.SqlCommand
-	    $cmd.Connection = $cn
-            try
-            {
-                $ServiceAccount = "SYSADMIN"
-                if( ($ServiceAccount -ne "") )
-                {
-                    write-host "Creating login $($DomainUser)"
-                    $queryForExists = "SELECT Name FROM master..syslogins where NAME = '"+$DomainUser+"'"
-                    $result = invoke-sqlcmd -serverinstance $ComputerName -query $queryForExists -database "master"
-                    if($result)
-                    {
-                        write-host "Login $DomainUser is already exists."
-                    }
-                    else
-                    {
-                        $cmdText = "CREATE LOGIN [$DomainUser] FROM WINDOWS WITH DEFAULT_DATABASE=[master], DEFAULT_LANGUAGE=[us_english];" 
-	                    $cmd.CommandText = $cmdText
-	                    $resultout = $cmd.ExecuteNonQuery()
-                     }
-                    if( $DBRole -ne "PUBLIC") #Public role membership can not be changed.
-                    {
-                        write-host "Adding role [$SqlAdminRole] for $DomainUser"
-                        $cmdText = "ALTER SERVER ROLE [$SqlAdminRole] ADD MEMBER [$DomainUser];" 
-	                    $cmd.CommandText = $cmdText
-	                    $resultout = $cmd.ExecuteNonQuery()
-                    }
-                }
-            }
-            catch
-            {
-                Write-host -ForegroundColor Red $Error[0] $_.Exception
-            }
-	    $cn.Close()
-        write-host -ForegroundColor Green "****** Exiting from method AddOrSetLogin *****"
-        Write-Host ""
+    $SQLUsername = $Domain + "\" + $UserName
+    add-type -AssemblyName "Microsoft.sqlserver.smo, version=13.0.0.0, culture=neutral, publickeytoken=89845dcd8080cc91"
+    $smo = New-Object Microsoft.SqlServer.Management.Smo.Server ($ComputerName)
+	if (!$smo.Logins.Contains($SQLUsername) )
+    {
+		echo "Username: $SQLUsername don't exist, creating ..... "
+        $SqlUser = New-Object -TypeName Microsoft.SqlServer.Management.Smo.Login -ArgumentList $smo, $SQLUsername
+	    $SqlUser.LoginType = 'WindowsUser'
+	    $sqlUser.PasswordPolicyEnforced = $false
+	    $SqlUser.Create()
+	    $SqlUser.AddToRole('sysadmin')
+        Write-Host -ForegroundColor Green "Added windows user to SQL Sysadmin role."
+		
 	}
-	Catch [system.exception]
+	else
 	{
-		Write-host -ForegroundColor Red $Error[0] $_.Exception
+		echo "Username: $SQLUsername - Already exists"
 	}
+
     
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
 ########################################
@@ -263,7 +231,7 @@ $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -Ou
         $command = "C:\SQLServerFull\setup.exe /ConfigurationFile=$($configfile)"
         Invoke-Expression -Command $command -Verbose
         Write-host -ForegroundColor Yellow "configuration done though INI file and its the time to restart the VM...."
-        Stop-Transcript -Verbose
+        Start-Sleep -Seconds 180 -Verbose
         Restart-Computer $env:computername -Force -Verbose
     }
     else
@@ -272,9 +240,9 @@ $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -Ou
     }
 
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
-#####################################################
+#############################################
 ### SQL features amendmends though INI Code END's ###
-#####################################################
+#############################################
 
 }
 else
