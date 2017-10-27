@@ -12,6 +12,7 @@ function InvokeWebRequest()
        Write-host -ForegroundColor Green "Executing InvokeWebRequest Function : Downloding Code from public repository ConfigurationFileASIS.ini, SqlDeployment.ps1, SqlDefaultLocationChange.sql, SQLFinalConfiguration.ps1"
        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/ConfigurationFileASIS.ini" -OutFile "C:\gitSqlDeploymentASIS\ConfigurationFileASIS.ini" -Verbose
        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/SQLFinalConfiguration.ps1" -OutFile "C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1" -Verbose
+       Invoke-WebRequest -Uri "https://raw.githubusercontent.com/AshishSharma303/Fiserv/master/GitSqlDeploymentDB/RemotePSConfigurationScriptBlockASIS.ps1" -OutFile "C:\gitSqlDeploymentASIS\RemotePSConfigurationScriptBlockASIS.ps1" -Verbose
     } # end of InvokeFunction
 
 
@@ -215,7 +216,7 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
     $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$Password)
-    Add-type -AssemblyName "Microsoft.AnalysisServices, Version=12.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
+    Add-type -AssemblyName "Microsoft.AnalysisServices, Version=14.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91"
     $s=New-Object Microsoft.AnalysisServices.server
 	$s.Connect($computerName)
 	$info = "Current Server Mode: " + $s.ServerMode
@@ -236,7 +237,7 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
     $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -OutputBufferingMode Drop  -Verbose
     Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$UserName,$Domain,$SqlAdminRole,$Password)
-    $ValidateInvokeRequest = Test-Path("C:\gitSqlDeploymentDB\*.ini")
+    $ValidateInvokeRequest = Test-Path("C:\gitSqlDeploymentASIS\*.ini")
     Write-Host -ForegroundColor Cyan "ValidateInvokeRequest Parameter value : $($ValidateInvokeRequest)"
     if($ValidateInvokeRequest)
     {
@@ -249,7 +250,7 @@ if (Test-Path("C:\gitSqlDeploymentASIS\SQLFinalConfiguration.ps1"))
     }
     else
     {
-        Write-Output "Configuration.ini file failed to download on local machine."
+        Write-Output "ASIS Configuration.ini file failed to download on local machine."
     }
 
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
