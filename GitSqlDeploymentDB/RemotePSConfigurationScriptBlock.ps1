@@ -183,6 +183,7 @@ $pso = New-PSSessionOption -OperationTimeout 7200000 -MaximumRedirection 100 -Ou
 	                    $cmd.CommandText = $cmdText
 	                    $resultout = $cmd.ExecuteNonQuery()
                      }
+                    $DBRole = "SYSADMIN"
                     if( $DBRole -ne "PUBLIC") #Public role membership can not be changed.
                     {
                         write-host "Adding role [$SqlAdminRole] for $DomainUser"

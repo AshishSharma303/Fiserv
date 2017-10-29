@@ -170,6 +170,61 @@ Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock 
 	{
 		echo "Username: $SQLUsername - Already exists"
 	}
+    
+    # trying once again with other method.
+    Try
+	{
+        write-host -ForegroundColor Green "*********** Entering method AddOrSetLogin ******"
+        Write-Host "Connecting to database ..."
+        [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SMO')  | out-null
+        # PSLogActivity $fileName "Connecting to database server $ServerName"
+	    Write-Host "hardcoded value for Service account to SYSADMIN"
+        $ServiceAccount = "SYSADMIN"
+        $cnstr = "Server="+$ComputerName+";Database=master;Integrated Security=True;"
+        $cn = New-Object System.Data.SqlClient.SqlConnection -Verbose
+	    $cn.ConnectionString = $cnstr
+	    $cn.Open()
+	    $cmd = new-object System.Data.SqlClient.SqlCommand
+	    $cmd.Connection = $cn
+            try
+            {
+            if( ($ServiceAccount -ne "") )
+                {
+                    write-host "Creating login $($SQLUsername)"
+                    $queryForExists = "SELECT Name FROM master..syslogins where NAME = '"+$SqlAdminRole+"'"
+                    $result = invoke-sqlcmd -serverinstance $ComputerName -query $queryForExists -database "master" -Verbose
+                    if($result)
+                    {
+                        write-host "Login $SQLUsername is already exists."
+                    }
+                    else
+                    {
+                        $cmdText = "CREATE LOGIN [$SQLUsername] FROM WINDOWS WITH DEFAULT_DATABASE=[master], DEFAULT_LANGUAGE=[us_english];" 
+	                    $cmd.CommandText = $cmdText
+	                    $resultout = $cmd.ExecuteNonQuery()
+                    }
+                    $DBRole = "SYSADMIN"
+                    if( $DBRole -ne "PUBLIC") #Public role membership can not be changed.
+                    {
+                        write-host "Adding role [$DBRole] for $($SQLUsername) through 2nd alternate method" 
+                        $cmdText = "ALTER SERVER ROLE [$DBRole] ADD MEMBER [$SQLUsername];"
+	                    $cmd.CommandText = $cmdText
+	                    $resultout = $cmd.ExecuteNonQuery() 
+                    }
+                }
+            }
+            catch
+            {
+                Write-host -ForegroundColor Red $Error[0] $_.Exception
+            }
+        $cn.Close()
+        write-host -ForegroundColor Green "****** Exiting from method AddOrSetLogin *****"
+        Write-Host ""
+	}
+	Catch [system.exception]
+	{
+		Write-host -ForegroundColor Red $Error[0] $_.Exception
+	}
 
     
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
@@ -206,6 +261,7 @@ Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock 
     $path = "C:\Program Files\Microsoft SQL Server\MSAS13.MSSQLSERVER\OLAP\Config\msmdsrv.ini" 
     (Get-Content $path) -replace "<DeploymentMode>0</DeploymentMode>","<DeploymentMode>2</DeploymentMode>" | out-file $path -Verbose
     Restart-Service -Name MSSQLServerOLAPService -Verbose
+    Write-Host "Changed the deploymnet Mode to 2 for Tab mode."
 
     } -ArgumentList $ComputerName, $Password -SessionOption $pso -Verbose
 ########################################
@@ -229,7 +285,7 @@ Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock 
         Write-Host -ForegroundColor Green "Found the configuration file and executing the sql Setup.."
         $configfile = "C:\gitSqlDeploymentASIS\ConfigurationFileASIS.ini"
         $command = "C:\SQLServerFull\setup.exe /ConfigurationFile=$($configfile)"
-        Invoke-Expression -Command $command -Verbose
+        Invoke-Expression -Command $command -Verbose | Out-Null
         Write-host -ForegroundColor Yellow "configuration done though INI file and its the time to restart the VM...."
         Start-Sleep -Seconds 180 -Verbose
         Restart-Computer $env:computername -Force -Verbose
