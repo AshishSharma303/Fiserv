@@ -229,7 +229,7 @@ Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock 
     
     } -ArgumentList $ComputerName, $UserName, $Domain, $SqlAdminRole, $Password -SessionOption $pso  -Verbose
 
-    Invoke-Command -ComputerName $computerName -Credential $cred -ScriptBlock {
+    Invoke-Command -ComputerName $computerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$Domain,$UserName)
     # trying with 3rd method
     Write-Host "Trying with 3rd method, sqluser.addToRole"
