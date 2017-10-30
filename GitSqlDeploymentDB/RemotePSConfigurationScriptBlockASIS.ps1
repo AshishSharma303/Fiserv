@@ -232,7 +232,7 @@ Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock 
     Invoke-Command -ComputerName $computerName -Credential $credential -ScriptBlock {
     Param($ComputerName,$Domain,$UserName)
     # trying with 3rd method
-    Write-Host "Trying with 3rd method, sqluser.addToRole"
+    Write-Host "Trying with 3rd method, sqluser. addToRole"
     add-type -AssemblyName "Microsoft.sqlserver.smo, version=13.0.0.0, culture=neutral, publickeytoken=89845dcd8080cc91" -Verbose
     $SQLUsername = $Domain + "\" + $UserName
     $smo = New-Object Microsoft.SqlServer.Management.Smo.Server ($SQLUsername) -Verbose
@@ -301,7 +301,7 @@ Invoke-Command -ComputerName $ComputerName -Credential $credential -ScriptBlock 
         $configfile = "C:\gitSqlDeploymentASIS\ConfigurationFileASIS.ini"
         $command = "C:\SQLServerFull\setup.exe /ConfigurationFile=$($configfile)"
         Invoke-Expression -Command $command -Verbose
-        Write-host -ForegroundColor Yellow "configuration done though INI file and its the time to restart the VM...."
+        Write-host -ForegroundColor Yellow "Configuration done though INI file and its the time to restart the VM...."
         Start-Sleep -Seconds 180 -Verbose
         # Restart-Computer $env:computername -Force -Verbose
     }
